@@ -1,0 +1,5022 @@
+<meta name='viewport' content='width=device-width, initial-scale=1'/><meta name='viewport' content='width=device-width, initial-scale=1'/><meta name='viewport' content='width=device-width, initial-scale=1'/><meta name='viewport' content='width=device-width, initial-scale=1'/><!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ТАПАТЕЛЬ 303</title>
+    <style>
+        /* Все стили остаются без изменений до .stats */
+        :root {
+            --primary-yellow: #ffeb3b;
+            --secondary-yellow: #ffc107;
+            --accent-orange: #ff9800;
+            --dark-yellow: #ffa000;
+            --darker-yellow: #ff8f00;
+            --background-yellow: #fff9c4;
+            --text-dark: #333;
+            --text-light: #fff;
+            --shadow: rgba(0, 0, 0, 0.2);
+            --ad-blue: #4285f4;
+            --ad-red: #ea4335;
+            --ad-green: #34a853;
+            --danger-red: #f44336;
+            --danger-dark: #d32f2f;
+        }
+        
+        body {
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            font-family: 'Arial', 'Segoe UI', sans-serif;
+            
+            /* Динамический фон будет устанавливаться через JS */
+            background: linear-gradient(-45deg, 
+                #ffff00, 
+                #ffeb3b, 
+                #ffc107, 
+                #ff9800, 
+                #ffeb3b,
+                #fff176,
+                #ffd54f,
+                #ffff00);
+            background-size: 400% 400%;
+            animation: gradientAnimation 15s ease infinite;
+            transition: background 0.5s ease;
+        }
+        
+        @keyframes gradientAnimation {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        .game-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+            background-color: rgba(255, 255, 255, 0.15);
+            border-bottom: 3px solid var(--text-dark);
+            height: 80px;
+            box-sizing: border-box;
+        }
+        
+        .game-title-container {
+            flex: 1;
+            text-align: center;
+        }
+        
+        .game-title {
+            color: var(--text-dark);
+            font-size: 3rem;
+            text-shadow: 
+                3px 3px 0 var(--accent-orange),
+                6px 6px 0 var(--shadow);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin: 0;
+            padding: 8px 20px;
+            background-color: rgba(255, 255, 255, 0.25);
+            border-radius: 12px;
+            backdrop-filter: blur(5px);
+            border: 3px solid var(--text-dark);
+            box-shadow: 0 8px 20px var(--shadow);
+            transform: perspective(500px) rotateX(5deg);
+            transition: all 0.3s ease;
+            display: inline-block;
+            line-height: 1.2;
+        }
+        
+        .control-buttons {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+        
+        .game-button {
+            background-color: rgba(255, 152, 0, 0.8);
+            color: white;
+            border: 2px solid var(--text-dark);
+            border-radius: 8px;
+            padding: 10px 18px;
+            font-size: 0.95rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            white-space: nowrap;
+        }
+        
+        .game-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(255, 152, 0, 0.3);
+        }
+        
+        .reset-button {
+            background-color: rgba(244, 67, 54, 0.8);
+            border-color: var(--danger-dark);
+        }
+        
+        .reset-button:hover {
+            background-color: var(--danger-red);
+            box-shadow: 0 6px 16px rgba(244, 67, 54, 0.3);
+        }
+        
+        .shop-button {
+            background-color: rgba(76, 175, 80, 0.8);
+            border-color: #4caf50;
+        }
+        
+        .shop-button:hover {
+            background-color: #4caf50;
+            box-shadow: 0 6px 16px rgba(76, 175, 80, 0.3);
+        }
+        
+        .settings-button {
+            background-color: rgba(66, 133, 244, 0.8);
+            border-color: var(--ad-blue);
+        }
+        
+        .settings-button:hover {
+            background-color: var(--ad-blue);
+            box-shadow: 0 6px 16px rgba(66, 133, 244, 0.3);
+        }
+        
+        /* Новая круглая синяя кнопка аккаунта */
+        .account-button {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #2196F3, #0D47A1);
+            border: 3px solid white;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 2000;
+            transition: all 0.3s ease;
+            overflow: hidden;
+        }
+        
+        .account-button:hover {
+            transform: scale(1.1) rotate(5deg);
+            box-shadow: 0 6px 15px rgba(33, 150, 243, 0.5);
+        }
+        
+        .account-button img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .account-button .default-avatar {
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+            text-shadow: 2px 2px 0 rgba(0,0,0,0.2);
+        }
+        
+        /* Окошко аккаунта */
+        .account-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.85);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10001;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .account-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .account-container {
+            background-color: white;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 400px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            transform: scale(0.8);
+            transition: transform 0.3s ease;
+            padding: 20px;
+        }
+        
+        .account-overlay.active .account-container {
+            transform: scale(1);
+        }
+        
+        .account-header {
+            text-align: center;
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #2196F3;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #2196F3;
+        }
+        
+        .account-avatar {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .avatar-preview {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #2196F3, #0D47A1);
+            border: 4px solid white;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 10px;
+            overflow: hidden;
+        }
+        
+        .avatar-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .avatar-preview .preview-text {
+            color: white;
+            font-size: 40px;
+            font-weight: bold;
+        }
+        
+        .avatar-upload-btn {
+            background: linear-gradient(90deg, #2196F3, #0D47A1);
+            color: white;
+            border: none;
+            border-radius: 20px;
+            padding: 8px 15px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .avatar-upload-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(33, 150, 243, 0.3);
+        }
+        
+        .account-form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        .form-group label {
+            font-size: 0.9rem;
+            color: #666;
+            font-weight: bold;
+        }
+        
+        .form-group input {
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .form-group input:focus {
+            border-color: #2196F3;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.2);
+        }
+        
+        .form-group input.error {
+            border-color: #f44336;
+        }
+        
+        .error-message {
+            color: #f44336;
+            font-size: 0.8rem;
+            margin-top: 3px;
+        }
+        
+        .account-stats {
+            background: linear-gradient(135deg, rgba(33, 150, 243, 0.1), rgba(13, 71, 161, 0.1));
+            border-radius: 15px;
+            padding: 15px;
+            margin-bottom: 20px;
+            border: 2px solid #2196F3;
+        }
+        
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px dashed #2196F3;
+        }
+        
+        .stat-item:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            color: #666;
+        }
+        
+        .stat-value {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #2196F3;
+        }
+        
+        .account-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .account-action-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+        
+        .login-btn {
+            background: linear-gradient(90deg, #4CAF50, #388E3C);
+            color: white;
+        }
+        
+        .register-btn {
+            background: linear-gradient(90deg, #2196F3, #0D47A1);
+            color: white;
+        }
+        
+        .logout-btn {
+            background: linear-gradient(90deg, #f44336, #d32f2f);
+            color: white;
+        }
+        
+        .close-account {
+            background: linear-gradient(90deg, #757575, #616161);
+            color: white;
+            margin-top: 10px;
+            padding: 10px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+        
+        .account-welcome {
+            text-align: center;
+            font-size: 1.2rem;
+            color: #2196F3;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+        
+        .container {
+            display: flex;
+            flex: 1;
+            padding: 10px;
+            margin-top: 100px;
+            justify-content: center;
+            align-items: flex-start;
+            overflow: hidden;
+            min-height: calc(100vh - 150px);
+        }
+        
+        .game-area {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px;
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+            height: calc(100vh - 150px);
+            box-sizing: border-box;
+        }
+        
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            flex-shrink: 0;
+            width: 100%;
+        }
+        
+        .stat-box {
+            background-color: rgba(255, 255, 255, 0.2);
+            border: 2px solid var(--text-dark);
+            border-radius: 10px;
+            padding: 12px 20px;
+            text-align: center;
+            min-width: 120px;
+            backdrop-filter: blur(5px);
+            box-shadow: 0 5px 15px var(--shadow);
+            flex: 1;
+            max-width: 140px;
+            transition: all 0.3s ease;
+        }
+        
+        .stat-box:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+            background-color: rgba(255, 255, 255, 0.3);
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--text-dark);
+            text-shadow: 2px 2px 0 rgba(255, 255, 255, 0.5);
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            color: #333;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .gif-container {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            max-width: 600px;
+            margin: 10px 0;
+            min-height: 300px;
+            max-height: 55vh;
+            position: relative;
+            top: -20px;
+        }
+        
+        .gif-container img {
+            max-width: 100%;
+            max-height: 100%;
+            display: block;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+            border-radius: 15px;
+            border: 5px solid var(--text-dark);
+            transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            cursor: pointer;
+            object-fit: contain;
+        }
+        
+        .jump {
+            animation: jumpAnimation 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+        
+        @keyframes jumpAnimation {
+            0% { transform: translateY(0) scale(1); }
+            25% { transform: translateY(-40px) scale(1.08); }
+            50% { transform: translateY(-80px) scale(1.15); }
+            75% { transform: translateY(-40px) scale(1.08); }
+            100% { transform: translateY(0) scale(1); }
+        }
+        
+        .shop-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.85);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10001;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .shop-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .shop-container {
+            background-color: white;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 900px;
+            max-height: 85vh;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            transform: scale(0.8);
+            transition: transform 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .shop-overlay.active .shop-container {
+            transform: scale(1);
+        }
+        
+        .shop-header {
+            background: linear-gradient(90deg, #4caf50, #388e3c);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 1.8rem;
+            position: relative;
+            border-bottom: 3px solid var(--text-dark);
+        }
+        
+        .shop-close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background-color: var(--ad-red);
+            color: white;
+            border: none;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.5rem;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            z-index: 10001;
+        }
+        
+        .shop-close:hover {
+            background-color: #d32f2f;
+            transform: scale(1.1);
+        }
+        
+        .shop-content {
+            display: flex;
+            flex: 1;
+            min-height: 0;
+            overflow: hidden;
+        }
+        
+        .shop-area {
+            flex: 1;
+            background-color: #f9f9f9;
+            padding: 25px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .shop-area::-webkit-scrollbar {
+            width: 10px;
+        }
+        
+        .shop-area::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.1);
+            border-radius: 5px;
+        }
+        
+        .shop-area::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, var(--accent-orange), var(--dark-yellow));
+            border-radius: 5px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .shop-area::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(180deg, var(--dark-yellow), var(--darker-yellow));
+        }
+        
+        .shop-title {
+            color: var(--text-dark);
+            font-size: 2rem;
+            text-align: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid var(--accent-orange);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        
+        .upgrades-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            padding-bottom: 30px;
+        }
+        
+        .upgrade-item {
+            background: linear-gradient(135deg, rgba(255, 235, 59, 0.3), rgba(255, 193, 7, 0.3));
+            border: 2px solid var(--text-dark);
+            border-radius: 12px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            min-height: 100px;
+        }
+        
+        .upgrade-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            background: linear-gradient(135deg, rgba(255, 235, 59, 0.5), rgba(255, 193, 7, 0.5));
+        }
+        
+        .upgrade-item.purchased {
+            background: linear-gradient(135deg, rgba(76, 175, 80, 0.3), rgba(56, 142, 60, 0.3));
+            border-color: #4caf50;
+        }
+        
+        .ad-upgrade {
+            background: linear-gradient(135deg, rgba(66, 133, 244, 0.2), rgba(234, 67, 53, 0.2));
+            border: 2px dashed var(--ad-blue);
+            animation: adPulse 2s infinite;
+            margin-top: 15px;
+        }
+        
+        @keyframes adPulse {
+            0% { box-shadow: 0 0 0 0 rgba(66, 133, 244, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(66, 133, 244, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(66, 133, 244, 0); }
+        }
+        
+        .ad-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background-color: var(--ad-red);
+            color: white;
+            font-size: 0.8rem;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-weight: bold;
+            box-shadow: 0 3px 10px rgba(234, 67, 53, 0.3);
+        }
+        
+        .upgrade-name {
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: var(--text-dark);
+            margin-bottom: 8px;
+        }
+        
+        .upgrade-description {
+            font-size: 1rem;
+            color: #555;
+            margin-bottom: 12px;
+            line-height: 1.4;
+        }
+        
+        .upgrade-cost {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #d32f2f;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .upgrade-level {
+            font-size: 1rem;
+            color: #666;
+            font-style: italic;
+        }
+        
+        .reset-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.85);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10001;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .reset-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .reset-container {
+            background-color: white;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 450px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            transform: scale(0.8);
+            transition: transform 0.3s ease;
+        }
+        
+        .reset-overlay.active .reset-container {
+            transform: scale(1);
+        }
+        
+        .reset-header {
+            background: linear-gradient(90deg, var(--danger-red), var(--danger-dark));
+            color: white;
+            padding: 20px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 1.5rem;
+            position: relative;
+        }
+        
+        .reset-content {
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .reset-warning {
+            color: var(--danger-red);
+            font-size: 1.8rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        
+        .reset-message {
+            color: #666;
+            font-size: 1.1rem;
+            line-height: 1.6;
+            margin-bottom: 25px;
+        }
+        
+        .reset-stats {
+            background-color: #f5f5f5;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 25px;
+            text-align: left;
+        }
+        
+        .reset-stat {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px dashed #ddd;
+        }
+        
+        .reset-stat:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+        
+        .reset-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+        
+        .reset-btn {
+            flex: 1;
+            padding: 15px 25px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .reset-cancel {
+            background: linear-gradient(90deg, #757575, #616161);
+            color: white;
+        }
+        
+        .reset-confirm {
+            background: linear-gradient(90deg, var(--danger-red), var(--danger-dark));
+            color: white;
+        }
+        
+        .ad-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.85);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10002;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .ad-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .ad-container {
+            background-color: white;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 400px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            transform: scale(0.8);
+            transition: transform 0.3s ease;
+        }
+        
+        .ad-overlay.active .ad-container {
+            transform: scale(1);
+        }
+        
+        .ad-header {
+            background: linear-gradient(90deg, var(--ad-blue), var(--ad-green));
+            color: white;
+            padding: 15px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+            position: relative;
+        }
+        
+        .ad-close {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: var(--ad-red);
+            color: white;
+            border: none;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.5rem;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            z-index: 10001;
+        }
+        
+        .ad-content {
+            padding: 20px;
+        }
+        
+        .ad-title {
+            color: var(--ad-blue);
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            text-align: center;
+            font-weight: bold;
+        }
+        
+        .ad-image {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(45deg, #f5f5f5, #e0e0e0);
+            border-radius: 10px;
+            margin-bottom: 15px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .ad-timer {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+        }
+        
+        .ad-text {
+            text-align: center;
+            color: #666;
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+        
+        .ad-company {
+            color: var(--ad-blue);
+            font-weight: bold;
+        }
+        
+        .ad-button {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(90deg, var(--ad-green), var(--ad-blue));
+            color: white;
+            border: none;
+            border-radius: 25px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            margin-top: 10px;
+        }
+        
+        .ad-reward {
+            text-align: center;
+            margin-top: 15px;
+            padding: 10px;
+            background-color: rgba(255, 193, 7, 0.1);
+            border-radius: 10px;
+            border-left: 4px solid var(--accent-orange);
+        }
+        
+        .music-controls {
+            position: fixed;
+            bottom: 10px;
+            left: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            background-color: rgba(255, 255, 255, 0.2);
+            padding: 8px 12px;
+            border-radius: 40px;
+            border: 2px solid var(--text-dark);
+            backdrop-filter: blur(5px);
+            z-index: 100;
+        }
+        
+        .music-controls-top {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .music-btn {
+            background-color: var(--accent-orange);
+            border: none;
+            border-radius: 50%;
+            width: 35px;
+            height: 35px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            color: white;
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+        }
+        
+        .music-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+        
+        .volume-slider {
+            width: 80px;
+            cursor: pointer;
+            flex-shrink: 0;
+            margin: 0;
+        }
+        
+        .music-close-btn {
+            background-color: var(--ad-red);
+            border: none;
+            border-radius: 50%;
+            width: 25px;
+            height: 25px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            color: white;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            margin-top: 2px;
+            opacity: 0.8;
+        }
+        
+        .music-close-btn:hover {
+            background-color: #d32f2f;
+            transform: scale(1.2);
+            opacity: 1;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+        }
+        
+        .settings-mobile-close-container {
+            display: none;
+            padding: 15px;
+            border-top: 2px solid #f0f0f0;
+            background-color: #f9f9f9;
+            text-align: center;
+        }
+        
+        .settings-mobile-close {
+            background: linear-gradient(90deg, #4CAF50, #388E3C);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            padding: 12px 25px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            max-width: 300px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        
+        .settings-mobile-close:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(76, 175, 80, 0.3);
+        }
+        
+        .tap-effect {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            background-color: rgba(255, 193, 7, 0.7);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 10;
+            animation: tapEffect 0.5s ease-out;
+        }
+        
+        @keyframes tapEffect {
+            0% { transform: scale(0); opacity: 1; }
+            100% { transform: scale(2); opacity: 0; }
+        }
+        
+        .notification {
+            position: fixed;
+            top: 100px;
+            right: 10px;
+            background-color: rgba(76, 175, 80, 0.9);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 10px;
+            border: 2px solid #4caf50;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            z-index: 1000000;
+            transform: translateX(150%);
+            transition: transform 0.5s ease;
+            max-width: 300px;
+            pointer-events: none;
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+        }
+        
+        .settings-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.85);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10001;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .settings-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .settings-container {
+            background-color: white;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 500px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            transform: scale(0.8);
+            transition: transform 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .settings-overlay.active .settings-container {
+            transform: scale(1);
+        }
+        
+        .settings-header {
+            background: linear-gradient(90deg, var(--ad-blue), var(--ad-green));
+            color: white;
+            padding: 20px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 1.5rem;
+            position: relative;
+        }
+        
+        .settings-close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background-color: var(--ad-red);
+            color: white;
+            border: none;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.5rem;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            z-index: 10001;
+        }
+        
+        .settings-content {
+            padding: 20px;
+            flex: 1;
+            overflow-y: auto;
+            max-height: 70vh;
+        }
+        
+        .settings-section {
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        
+        .settings-section:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+        
+        .settings-title {
+            color: var(--ad-blue);
+            font-size: 1.2rem;
+            margin-bottom: 12px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .custom-music-section, .custom-image-section, .fullscreen-section, .sound-section {
+            background-color: #f9f9f9;
+            border-radius: 10px;
+            padding: 15px;
+            border: 2px dashed #ddd;
+        }
+        
+        .music-upload-group, .image-upload-group, .fullscreen-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+        
+        .music-file-input, .image-file-input {
+            display: none;
+        }
+        
+        .music-upload-btn, .image-upload-btn, .fullscreen-toggle-btn, .exit-fullscreen-btn {
+            background: linear-gradient(90deg, var(--ad-green), var(--ad-blue));
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 15px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            justify-content: center;
+            flex: 1;
+        }
+        
+        .exit-fullscreen-btn {
+            background: linear-gradient(90deg, #FF9800, #F57C00);
+        }
+        
+        .fullscreen-toggle-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(66, 133, 244, 0.3);
+        }
+        
+        .exit-fullscreen-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(255, 152, 0, 0.3);
+        }
+        
+        .music-remove-btn, .image-remove-btn {
+            background: linear-gradient(90deg, var(--ad-red), #d32f2f);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 15px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex: 1;
+        }
+        
+        .music-file-info, .image-file-info {
+            background-color: rgba(66, 133, 244, 0.1);
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            border-left: 4px solid var(--ad-blue);
+        }
+        
+        .music-file-name, .image-file-name {
+            font-weight: bold;
+            color: var(--ad-blue);
+            margin-bottom: 5px;
+            font-size: 1rem;
+            word-break: break-all;
+        }
+        
+        .music-file-details, .image-file-details {
+            color: #666;
+            font-size: 0.85rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        
+        .music-file-size, .image-file-size {
+            background-color: rgba(76, 175, 80, 0.1);
+            padding: 2px 8px;
+            border-radius: 4px;
+            color: #2e7d32;
+        }
+        
+        .music-file-type, .image-file-type {
+            background-color: rgba(255, 193, 7, 0.1);
+            padding: 2px 8px;
+            border-radius: 4px;
+            color: #ff8f00;
+        }
+        
+        .image-scale-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 15px;
+            padding: 12px;
+            background-color: rgba(255, 235, 59, 0.1);
+            border-radius: 8px;
+            border: 1px solid #ddd;
+        }
+        
+        .scale-slider-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .scale-slider-label {
+            font-size: 0.9rem;
+            color: #666;
+            min-width: 100px;
+        }
+        
+        .scale-slider {
+            flex: 1;
+            cursor: pointer;
+            margin: 0;
+        }
+        
+        .scale-value {
+            font-size: 0.9rem;
+            font-weight: bold;
+            color: var(--ad-blue);
+            min-width: 40px;
+            text-align: center;
+        }
+        
+        .scale-buttons {
+            display: flex;
+            gap: 8px;
+            margin-top: 5px;
+        }
+        
+        .scale-btn {
+            flex: 1;
+            padding: 8px 12px;
+            background: linear-gradient(90deg, #9C27B0, #7B1FA2);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+        
+        .scale-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(156, 39, 176, 0.3);
+        }
+        
+        .scale-btn.reset {
+            background: linear-gradient(90deg, #757575, #616161);
+        }
+        
+        .fullscreen-status {
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 0.9rem;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            margin-bottom: 10px;
+            background-color: rgba(76, 175, 80, 0.1);
+            color: #2e7d32;
+            border: 2px solid #4caf50;
+        }
+        
+        .fullscreen-status.active {
+            background-color: rgba(255, 152, 0, 0.1);
+            color: #FF9800;
+            border-color: #FF9800;
+            animation: pulseFullscreen 2s infinite;
+        }
+        
+        @keyframes pulseFullscreen {
+            0% { box-shadow: 0 0 0 0 rgba(255, 152, 0, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(255, 152, 0, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(255, 152, 0, 0); }
+        }
+        
+        .fullscreen-hotkeys {
+            margin-top: 10px;
+            padding: 8px;
+            background-color: rgba(158, 158, 158, 0.1);
+            border-radius: 6px;
+            font-size: 0.8rem;
+            color: #666;
+            text-align: center;
+        }
+        
+        .repeat-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 15px;
+            padding: 10px;
+            background-color: rgba(255, 235, 59, 0.1);
+            border-radius: 8px;
+            border: 1px solid #ddd;
+        }
+        
+        .repeat-toggle-btn {
+            background: linear-gradient(90deg, #9C27B0, #7B1FA2);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 8px 12px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex: 1;
+        }
+        
+        .repeat-toggle-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(156, 39, 176, 0.3);
+        }
+        
+        .repeat-toggle-btn.active {
+            background: linear-gradient(90deg, #4CAF50, #388E3C);
+            box-shadow: 0 0 10px rgba(76, 175, 80, 0.5);
+        }
+        
+        .repeat-indicator {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background-color: #ff9800;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.7rem;
+            font-weight: bold;
+            animation: pulse 2s infinite;
+        }
+        
+        .repeat-indicator.active {
+            background-color: #4CAF50;
+            animation: pulseActive 1s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 0.5; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.1); }
+            100% { opacity: 0.5; transform: scale(1); }
+        }
+        
+        @keyframes pulseActive {
+            0% { box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(76, 175, 80, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(76, 175, 80, 0); }
+        }
+        
+        .music-status, .image-status {
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 0.9rem;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            user-select: none;
+            margin-bottom: 10px;
+        }
+        
+        .music-status:hover, .image-status:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .music-status.playing {
+            background-color: rgba(76, 175, 80, 0.1);
+            color: #2e7d32;
+            border: 2px solid #4caf50;
+        }
+        
+        .music-status.stopped {
+            background-color: rgba(244, 67, 54, 0.1);
+            color: #c62828;
+            border: 2px solid #f44336;
+        }
+        
+        .music-status.no-file, .image-status.no-file {
+            background-color: rgba(158, 158, 158, 0.1);
+            color: #616161;
+            border: 2px solid #9e9e9e;
+            cursor: default;
+        }
+        
+        .promo-section {
+            background-color: #f9f9f9;
+            border-radius: 10px;
+            padding: 15px;
+            border: 2px dashed #ddd;
+        }
+        
+        .promo-input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+        
+        .promo-input {
+            flex: 1;
+            padding: 10px 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-family: 'Arial', sans-serif;
+            transition: all 0.3s ease;
+        }
+        
+        .promo-button {
+            background: linear-gradient(90deg, var(--ad-green), var(--ad-blue));
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 15px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            justify-content: center;
+        }
+        
+        .promo-button:disabled {
+            background: linear-gradient(90deg, #cccccc, #aaaaaa);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .promo-status {
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 0.85rem;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            margin-bottom: 10px;
+        }
+        
+        .promo-status.available {
+            background-color: rgba(76, 175, 80, 0.1);
+            color: #2e7d32;
+            border: 2px solid #4caf50;
+        }
+        
+        .promo-status.used {
+            background-color: rgba(244, 67, 54, 0.1);
+            color: #c62828;
+            border: 2px solid #f44336;
+        }
+        
+        .promo-reward {
+            text-align: center;
+            margin-top: 12px;
+            padding: 8px;
+            background: linear-gradient(90deg, rgba(255, 193, 7, 0.1), rgba(255, 152, 0, 0.1));
+            border-radius: 8px;
+            border-left: 4px solid var(--accent-orange);
+            font-size: 0.85rem;
+            color: #666;
+            line-height: 1.4;
+            display: none;
+        }
+        
+        .hint-text {
+            font-size: 0.75rem;
+            color: #888;
+            margin-top: 5px;
+            font-style: italic;
+        }
+        
+        .audio-controls {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+        }
+        
+        .audio-play-btn, .audio-pause-btn, .audio-stop-btn {
+            flex: 1;
+            padding: 8px 10px;
+            border: none;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            font-size: 0.85rem;
+        }
+        
+        .audio-play-btn {
+            background-color: #4caf50;
+            color: white;
+        }
+        
+        .audio-pause-btn {
+            background-color: #ff9800;
+            color: white;
+        }
+        
+        .audio-stop-btn {
+            background-color: #f44336;
+            color: white;
+        }
+        
+        /* НОВЫЕ СТИЛИ ДЛЯ СЕКЦИИ ГРОМКОСТИ */
+        .volume-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 15px;
+            padding: 12px;
+            background-color: rgba(66, 133, 244, 0.1);
+            border-radius: 8px;
+            border: 1px solid #ddd;
+        }
+        
+        .volume-slider-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .volume-slider-label {
+            font-size: 0.9rem;
+            color: #666;
+            min-width: 120px;
+        }
+        
+        .volume-slider-large {
+            flex: 1;
+            cursor: pointer;
+            margin: 0;
+            height: 8px;
+            border-radius: 4px;
+            background: #ddd;
+            -webkit-appearance: none;
+        }
+        
+        .volume-slider-large::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--ad-blue);
+            cursor: pointer;
+            border: 2px solid white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        
+        .volume-slider-large::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--ad-blue);
+            cursor: pointer;
+            border: 2px solid white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        
+        .volume-value {
+            font-size: 0.9rem;
+            font-weight: bold;
+            color: var(--ad-blue);
+            min-width: 40px;
+            text-align: center;
+        }
+        
+        .volume-buttons {
+            display: flex;
+            gap: 8px;
+            margin-top: 5px;
+        }
+        
+        .volume-btn {
+            flex: 1;
+            padding: 8px 12px;
+            background: linear-gradient(90deg, var(--ad-blue), var(--ad-green));
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+        
+        .volume-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(66, 133, 244, 0.3);
+        }
+        
+        .volume-btn.reset {
+            background: linear-gradient(90deg, #757575, #616161);
+        }
+        
+        .volume-btn.mute {
+            background: linear-gradient(90deg, #f44336, #d32f2f);
+        }
+        
+        /* НОВАЯ СЕКЦИЯ ДЛЯ ЦВЕТА ФОНА */
+        .background-color-section {
+            background-color: #f9f9f9;
+            border-radius: 10px;
+            padding: 15px;
+            border: 2px dashed var(--ad-green);
+            margin-bottom: 15px;
+        }
+        
+        .background-color-section .settings-title {
+            color: var(--ad-green);
+        }
+        
+        .color-picker-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 10px;
+        }
+        
+        .color-picker-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .color-picker-label {
+            font-size: 0.9rem;
+            color: #666;
+            min-width: 70px;
+        }
+        
+        .color-picker-input {
+            width: 60px;
+            height: 40px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            cursor: pointer;
+            padding: 0;
+            background: transparent;
+        }
+        
+        .color-picker-input::-webkit-color-swatch-wrapper {
+            padding: 0;
+        }
+        
+        .color-picker-input::-webkit-color-swatch {
+            border: none;
+            border-radius: 6px;
+        }
+        
+        .color-value {
+            font-size: 0.9rem;
+            font-family: monospace;
+            color: var(--ad-blue);
+            background-color: rgba(66, 133, 244, 0.1);
+            padding: 4px 8px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+        
+        .color-presets {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 5px;
+        }
+        
+        .color-preset {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            border: 2px solid #ddd;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .color-preset:hover {
+            transform: scale(1.1);
+            border-color: var(--ad-blue);
+            box-shadow: 0 4px 8px rgba(66, 133, 244, 0.3);
+        }
+        
+        .color-preset.active {
+            border: 3px solid var(--ad-blue);
+            box-shadow: 0 0 0 2px white, 0 0 0 4px var(--ad-blue);
+        }
+        
+        .color-preset.gradient {
+            background: linear-gradient(45deg, #ffff00, #ff9800, #ffeb3b);
+        }
+        
+        .gradient-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 10px;
+            padding: 8px 12px;
+            background-color: rgba(255, 152, 0, 0.1);
+            border-radius: 8px;
+            border-left: 4px solid var(--accent-orange);
+        }
+        
+        .gradient-toggle {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-left: auto;
+        }
+        
+        .gradient-toggle input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: var(--accent-orange);
+        }
+        
+        .background-preview {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 8px;
+            background: rgba(0,0,0,0.05);
+            text-align: center;
+            font-size: 0.85rem;
+            color: #666;
+        }
+        
+        /* АДАПТИВНЫЕ СТИЛИ ДЛЯ МОБИЛЬНЫХ УСТРОЙСТВ */
+        @media (max-width: 768px) {
+            .game-header {
+                flex-direction: column;
+                gap: 8px;
+                height: auto;
+                padding: 10px;
+            }
+            
+            .game-title-container {
+                order: 1;
+                margin-bottom: 5px;
+            }
+            
+            .control-buttons {
+                order: 2;
+                width: 100%;
+                justify-content: center;
+                gap: 8px;
+            }
+            
+            .account-button {
+                top: 5px;
+                right: 5px;
+                width: 40px;
+                height: 40px;
+            }
+            
+            .game-title {
+                font-size: 1.8rem;
+                padding: 6px 12px;
+            }
+            
+            .container {
+                margin-top: 120px;
+            }
+            
+            .stats {
+                gap: 8px;
+                margin-bottom: 10px;
+            }
+            
+            .stat-box {
+                min-width: 100px;
+                padding: 8px 12px;
+                max-width: 110px;
+            }
+            
+            .stat-value {
+                font-size: 1.6rem;
+            }
+            
+            .stat-label {
+                font-size: 0.8rem;
+            }
+            
+            .gif-container {
+                max-height: 50vh;
+                min-height: 250px;
+            }
+            
+            .settings-container {
+                max-width: 95%;
+                max-height: 90vh;
+            }
+            
+            .settings-content {
+                max-height: 65vh;
+                padding: 15px;
+            }
+            
+            .settings-section {
+                margin-bottom: 15px;
+                padding-bottom: 15px;
+            }
+            
+            .settings-title {
+                font-size: 1.1rem;
+            }
+            
+            .custom-music-section, .custom-image-section, .promo-section, .fullscreen-section, .sound-section {
+                padding: 12px;
+            }
+            
+            .music-upload-group, .image-upload-group, .fullscreen-controls {
+                flex-direction: row;
+            }
+            
+            .promo-input-group {
+                flex-direction: row;
+            }
+            
+            .audio-controls {
+                flex-direction: row;
+            }
+            
+            .scale-slider-container {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 5px;
+            }
+            
+            .scale-slider-label {
+                min-width: auto;
+                width: 100%;
+            }
+            
+            .scale-slider {
+                width: 100%;
+            }
+            
+            .scale-buttons {
+                flex-direction: row;
+            }
+            
+            .volume-controls {
+                padding: 10px;
+            }
+            
+            .volume-slider-container {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 5px;
+            }
+            
+            .volume-slider-label {
+                min-width: auto;
+                width: 100%;
+            }
+            
+            .volume-slider-large {
+                width: 100%;
+            }
+            
+            .volume-buttons {
+                flex-direction: row;
+            }
+            
+            .settings-mobile-close-container {
+                display: block;
+            }
+            
+            .color-picker-row {
+                flex-wrap: wrap;
+            }
+            
+            .color-presets {
+                justify-content: center;
+            }
+            
+            .account-container {
+                width: 95%;
+                padding: 15px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .game-title {
+                font-size: 1.5rem;
+            }
+            
+            .game-button {
+                padding: 8px 12px;
+                font-size: 0.85rem;
+            }
+            
+            .stat-box {
+                min-width: 85px;
+                padding: 6px 8px;
+                max-width: 90px;
+            }
+            
+            .stat-value {
+                font-size: 1.4rem;
+            }
+            
+            .music-upload-group, .image-upload-group, .fullscreen-controls {
+                flex-direction: column;
+            }
+            
+            .promo-input-group {
+                flex-direction: column;
+            }
+            
+            .audio-controls {
+                flex-direction: column;
+            }
+            
+            .scale-buttons {
+                flex-direction: column;
+            }
+            
+            .volume-buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Шапка игры с названием и кнопками -->
+    <div class="game-header">
+        <div class="game-title-container">
+            <h1 class="game-title">ТАПАТЕЛЬ 303</h1>
+        </div>
+        <div class="control-buttons">
+            <button class="game-button shop-button" id="shop-button">
+                <span>🛒</span> Магазин
+            </button>
+            <button class="game-button reset-button" id="reset-button">
+                <span>🗑️</span> Сброс
+            </button>
+            <button class="game-button settings-button" id="settings-button">
+                <span>⚙️</span> Настройки
+            </button>
+        </div>
+    </div>
+    
+    <!-- Новая круглая синяя кнопка аккаунта -->
+    <div class="account-button" id="account-button">
+        <div class="default-avatar" id="account-avatar">👤</div>
+        <img id="account-avatar-img" style="display: none;">
+    </div>
+    
+    <!-- Окошко аккаунта -->
+    <div class="account-overlay" id="account-overlay">
+        <div class="account-container">
+            <div class="account-header" id="account-header">🔵 АККАУНТ</div>
+            
+            <div class="account-avatar">
+                <div class="avatar-preview" id="avatar-preview">
+                    <div class="preview-text">👤</div>
+                    <img id="avatar-preview-img" style="display: none;">
+                </div>
+                <input type="file" id="avatar-input" accept="image/*" style="display: none;">
+                <button class="avatar-upload-btn" id="avatar-upload-btn">
+                    <span>📷</span> Загрузить аватар
+                </button>
+            </div>
+            
+            <div id="account-login-form">
+                <div class="account-form">
+                    <div class="form-group">
+                        <label>Никнейм:</label>
+                        <input type="text" id="login-username" placeholder="Введите никнейм">
+                    </div>
+                    <div class="form-group">
+                        <label>Пароль (мин. 6 символов):</label>
+                        <input type="password" id="login-password" placeholder="Введите пароль">
+                        <div class="error-message" id="login-error"></div>
+                    </div>
+                </div>
+                
+                <div class="account-buttons">
+                    <button class="account-action-btn login-btn" id="login-btn">
+                        <span>🔑</span> Войти
+                    </button>
+                    <button class="account-action-btn register-btn" id="register-btn">
+                        <span>📝</span> Регистрация
+                    </button>
+                </div>
+            </div>
+            
+            <div id="account-profile" style="display: none;">
+                <div class="account-welcome" id="welcome-message"></div>
+                
+                <div class="account-stats">
+                    <div class="stat-item">
+                        <span class="stat-label">Дней в игре:</span>
+                        <span class="stat-value" id="stat-days">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Кликов по гифке:</span>
+                        <span class="stat-value" id="stat-taps">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Куплено улучшений:</span>
+                        <span class="stat-value" id="stat-upgrades">0</span>
+                    </div>
+                </div>
+                
+                <button class="account-action-btn logout-btn" id="logout-btn">
+                    <span>🚪</span> Выйти
+                </button>
+            </div>
+            
+            <button class="close-account" id="close-account">× Закрыть</button>
+        </div>
+    </div>
+    
+    <!-- Основная игровая область -->
+    <div class="container">
+        <div class="game-area">
+            <div class="stats">
+                <div class="stat-box">
+                    <div class="stat-value" id="tap-count">0</div>
+                    <div class="stat-label">Тапы</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value" id="taps-per-second">1</div>
+                    <div class="stat-label">Тапов/сек</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value" id="taps-per-click">1</div>
+                    <div class="stat-label">Тапов/клик</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value" id="balance">0</div>
+                    <div class="stat-label">Баланс</div>
+                </div>
+            </div>
+            
+            <div class="gif-container">
+                <img src="https://gifs.obs.ru-moscow-1.hc.sbercloud.ru/fcae637ba9f2333c2348880c33f30ddb120dcf94d65bc6ec4310face52cb92db.gif" 
+                     alt="ТАПАТЕЛЬ 303"
+                     id="animated-gif">
+            </div>
+        </div>
+    </div>
+    
+    <!-- Всплывающее окно магазина -->
+    <div class="shop-overlay" id="shop-overlay">
+        <div class="shop-container">
+            <div class="shop-header">
+                🛒 МАГАЗИН УЛУЧШЕНИЙ
+                <button class="shop-close" id="shop-close">×</button>
+            </div>
+            <div class="shop-content">
+                <div class="shop-area">
+                    <div class="shop-title">Выберите улучшение</div>
+                    <div class="upgrades-container" id="upgrades-container"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Остальные всплывающие окна -->
+    <div class="reset-overlay" id="reset-overlay">
+        <div class="reset-container">
+            <div class="reset-header">
+                <span>⚠️</span> СБРОС ВСЕХ ДАННЫХ
+            </div>
+            <div class="reset-content">
+                <div class="reset-warning">ВЫ УВЕРЕНЫ?</div>
+                <div class="reset-message">
+                    Это действие удалит весь ваш прогресс, тапы, улучшения и вернет игру в начальное состояние. 
+                    Это действие невозможно отменить!
+                </div>
+                
+                <div class="reset-buttons">
+                    <button class="reset-btn reset-cancel" id="reset-cancel">
+                        <span>↩️</span> Отмена
+                    </button>
+                    <button class="reset-btn reset-confirm" id="reset-confirm">
+                        <span>🗑️</span> Удалить всё
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="ad-overlay" id="ad-overlay">
+        <div class="ad-container">
+            <div class="ad-header">
+                Реклама
+                <button class="ad-close" id="ad-close">×</button>
+            </div>
+            <div class="ad-content">
+                <div class="ad-title" id="ad-title">Установите TAP GAMES 3000!</div>
+                
+                <div class="ad-image">
+                    <div class="ad-product">🎮</div>
+                    <div class="ad-timer" id="ad-timer">Реклама: 5с</div>
+                </div>
+                
+                <div class="ad-text">
+                    Хотите тапать ещё быстрее? 
+                    <span class="ad-company">TAP GAMES 3000</span> - это революционное приложение 
+                    для профессиональных таперов! Увеличивайте вашу продуктивность на 300%!
+                </div>
+                
+                <div class="ad-reward">
+                    <strong>Награда:</strong> После просмотра рекламы вы получите +1 к балансу!
+                </div>
+                
+                <button class="ad-button" id="ad-button">УСТАНОВИТЬ БЕСПЛАТНО</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="settings-overlay" id="settings-overlay">
+        <div class="settings-container">
+            <div class="settings-header">
+                ⚙️ Настройки игры
+                <button class="settings-close" id="settings-close">×</button>
+            </div>
+            <div class="settings-content">
+                <!-- Секция загрузки собственной музыки -->
+                <div class="settings-section">
+                    <div class="settings-title">
+                        <span>🎵</span> Собственная музыка
+                    </div>
+                    <div class="custom-music-section">
+                        <div class="music-upload-group">
+                            <input type="file" class="music-file-input" id="music-file-input" 
+                                   accept=".mp3,.ogg,.wav,.wave" style="display: none;">
+                            <button class="music-upload-btn" id="music-upload-btn">
+                                <span>📁</span> Загрузить музыку
+                            </button>
+                            <button class="music-remove-btn" id="music-remove-btn">
+                                <span>🗑️</span> Удалить
+                            </button>
+                        </div>
+                        
+                        <div class="music-file-info" id="music-file-info" style="display: none;">
+                            <div class="music-file-name" id="music-file-name"></div>
+                            <div class="music-file-details">
+                                <span class="music-file-type" id="music-file-type"></span>
+                                <span class="music-file-size" id="music-file-size"></span>
+                            </div>
+                            
+                            <!-- КОНТРОЛЫ ПОВТОРА -->
+                            <div class="repeat-controls">
+                                <button class="repeat-toggle-btn" id="repeat-toggle-btn">
+                                    <span>🔁</span> Повтор музыки
+                                </button>
+                                <div class="repeat-indicator" id="repeat-indicator">?</div>
+                            </div>
+                            
+                            <div class="audio-controls">
+                                <button class="audio-play-btn" id="audio-play-btn">
+                                    <span>▶️</span> Воспроизвести
+                                </button>
+                                <button class="audio-pause-btn" id="audio-pause-btn">
+                                    <span>⏸️</span> Пауза
+                                </button>
+                                <button class="audio-stop-btn" id="audio-stop-btn">
+                                    <span>⏹️</span> Стоп
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="music-status no-file" id="music-status">
+                            🎵 Музыка не загружена
+                        </div>
+                        
+                        <div class="hint-text">
+                            Поддерживаемые форматы: MP3, OGG, WAV, WAVE
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- НОВАЯ СЕКЦИЯ: Громкость музыки -->
+                <div class="settings-section">
+                    <div class="settings-title">
+                        <span>🔊</span> Громкость музыки
+                    </div>
+                    <div class="sound-section">
+                        <div class="volume-controls">
+                            <div class="volume-slider-container">
+                                <div class="volume-slider-label">Громкость музыки:</div>
+                                <input type="range" min="0" max="100" value="50" class="volume-slider-large" id="music-volume-slider">
+                                <div class="volume-value" id="music-volume-value">50%</div>
+                            </div>
+                            
+                            <div class="volume-buttons">
+                                <button class="volume-btn" id="volume-down-btn">
+                                    <span>🔉</span> Тише
+                                </button>
+                                <button class="volume-btn" id="volume-up-btn">
+                                    <span>🔊</span> Громче
+                                </button>
+                                <button class="volume-btn mute" id="volume-mute-btn">
+                                    <span>🔇</span> Выкл. звук
+                                </button>
+                                <button class="volume-btn reset" id="volume-reset-btn">
+                                    <span>↻</span> По умолчанию
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="hint-text">
+                            Настройте громкость фоновой музыки и звуков игры
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Секция: Загрузка своих изображений/гифок -->
+                <div class="settings-section">
+                    <div class="settings-title">
+                        <span>🖼️</span> Свои изображения/гифки
+                    </div>
+                    <div class="custom-image-section">
+                        <div class="image-upload-group">
+                            <input type="file" class="image-file-input" id="image-file-input" 
+                                   accept=".jpg,.jpeg,.png,.gif,.webp" style="display: none;">
+                            <button class="image-upload-btn" id="image-upload-btn">
+                                <span>📁</span> Загрузить изображение
+                            </button>
+                            <button class="image-remove-btn" id="image-remove-btn">
+                                <span>🗑️</span> Сбросить
+                            </button>
+                        </div>
+                        
+                        <div class="image-file-info" id="image-file-info" style="display: none;">
+                            <div class="image-file-name" id="image-file-name"></div>
+                            <div class="image-file-details">
+                                <span class="image-file-type" id="image-file-type"></span>
+                                <span class="image-file-size" id="image-file-size"></span>
+                            </div>
+                            
+                            <!-- КОНТРОЛЫ МАСШТАБИРОВАНИЯ -->
+                            <div class="image-scale-controls">
+                                <div class="scale-slider-container">
+                                    <div class="scale-slider-label">Масштаб изображения:</div>
+                                    <input type="range" min="50" max="200" value="100" class="scale-slider" id="image-scale-slider">
+                                    <div class="scale-value" id="scale-value">100%</div>
+                                </div>
+                                
+                                <div class="scale-buttons">
+                                    <button class="scale-btn" id="scale-down-btn">
+                                        <span>➖</span> Уменьшить
+                                    </button>
+                                    <button class="scale-btn" id="scale-up-btn">
+                                        <span>➕</span> Увеличить
+                                    </button>
+                                    <button class="scale-btn reset" id="scale-reset-btn">
+                                        <span>↻</span> Сбросить
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div class="hint-text">
+                                Изменяйте размер изображения для удобства игры
+                            </div>
+                        </div>
+                        
+                        <div class="image-status no-file" id="image-status">
+                            🖼️ Используется стандартная гифка
+                        </div>
+                        
+                        <div class="hint-text">
+                            Поддерживаемые форматы: JPG, PNG, GIF, WEBP (до 10 МБ)
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- СЕКЦИЯ: Полноэкранный режим -->
+                <div class="settings-section">
+                    <div class="settings-title">
+                        <span>📺</span> Полноэкранный режим
+                    </div>
+                    <div class="fullscreen-section">
+                        <div class="fullscreen-status" id="fullscreen-status">
+                            🔲 Обычный режим
+                        </div>
+                        
+                        <div class="fullscreen-controls">
+                            <button class="fullscreen-toggle-btn" id="fullscreen-toggle-btn">
+                                <span>📺</span> Включить полноэкранный режим
+                            </button>
+                            <button class="exit-fullscreen-btn" id="exit-fullscreen-btn">
+                                <span>📱</span> Выйти из полноэкранного режима
+                            </button>
+                        </div>
+                        
+                        <div class="fullscreen-hotkeys">
+                            <strong>Горячие клавиши:</strong><br>
+                            • F11 - Включить/выключить полноэкранный режим<br>
+                            • ESC - Выйти из полноэкранного режима
+                        </div>
+                        
+                        <div class="hint-text">
+                            Работает на компьютерах и поддерживаемых мобильных устройствах
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- НОВАЯ СЕКЦИЯ: Цвет фона -->
+                <div class="settings-section">
+                    <div class="settings-title">
+                        <span>🎨</span> Цвет фона
+                    </div>
+                    <div class="background-color-section">
+                        <div class="color-picker-container">
+                            <div class="color-picker-row">
+                                <div class="color-picker-label">Выберите цвет:</div>
+                                <input type="color" class="color-picker-input" id="bg-color-picker" value="#ffff00">
+                                <span class="color-value" id="bg-color-value">#ffff00</span>
+                            </div>
+                            
+                            <div class="color-presets">
+                                <div class="color-preset" style="background: linear-gradient(45deg, #ffff00, #ff9800, #ffeb3b);" data-gradient="true" data-colors="#ffff00,#ff9800,#ffeb3b" title="Градиент по умолчанию"></div>
+                                <div class="color-preset" style="background-color: #ffeb3b;" data-color="#ffeb3b" title="Желтый"></div>
+                                <div class="color-preset" style="background-color: #ff9800;" data-color="#ff9800" title="Оранжевый"></div>
+                                <div class="color-preset" style="background-color: #f44336;" data-color="#f44336" title="Красный"></div>
+                                <div class="color-preset" style="background-color: #4caf50;" data-color="#4caf50" title="Зеленый"></div>
+                                <div class="color-preset" style="background-color: #2196F3;" data-color="#2196F3" title="Синий"></div>
+                                <div class="color-preset" style="background-color: #9C27B0;" data-color="#9C27B0" title="Фиолетовый"></div>
+                                <div class="color-preset" style="background-color: #000000;" data-color="#000000" title="Черный"></div>
+                                <div class="color-preset" style="background-color: #ffffff; border: 2px solid #ccc;" data-color="#ffffff" title="Белый"></div>
+                            </div>
+                            
+                            <div class="gradient-status">
+                                <span>🌈 Анимированный градиент:</span>
+                                <div class="gradient-toggle">
+                                    <label for="gradient-toggle">Вкл/Выкл</label>
+                                    <input type="checkbox" id="gradient-toggle" checked>
+                                </div>
+                            </div>
+                            
+                            <div class="background-preview" id="bg-preview">
+                                Предпросмотр: текущий фон
+                            </div>
+                            
+                            <div class="hint-text">
+                                Выберите любой цвет из палитры или используйте предустановки.
+                                Градиент можно отключить для однотонного фона.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Секция промокодов -->
+                <div class="settings-section">
+                    <div class="settings-title">
+                        <span>🎁</span> Промокоды
+                    </div>
+                    <div class="promo-section">
+                        <div class="promo-input-group">
+                            <input type="text" class="promo-input" id="promo-input" 
+                                   placeholder="Введите промокод..." maxlength="50">
+                            <button class="promo-button" id="promo-button">
+                                <span>🎯</span> Активировать
+                            </button>
+                        </div>
+                        
+                        <div class="promo-status available" id="promo-status">
+                            🎁 Промокод доступен для активации
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="settings-mobile-close-container">
+                <button class="settings-mobile-close" id="settings-mobile-close">
+                    × Закрыть (музыка продолжит играть)
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- МУЗЫКАЛЬНЫЕ КОНТРОЛЫ -->
+    <div class="music-controls">
+        <div class="music-controls-top">
+            <button class="music-btn" id="play-btn">▶️</button>
+            <button class="music-btn" id="pause-btn">⏸️</button>
+            <input type="range" min="0" max="100" value="50" class="volume-slider" id="volume-slider">
+        </div>
+        <button class="music-close-btn" id="music-close-btn">×</button>
+    </div>
+    
+    <div class="notification" id="notification"></div>
+
+    <!-- Скрытый аудио элемент -->
+    <audio id="custom-audio-player" style="display: none;"></audio>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Глобальные переменные
+            let tapCount = 0;
+            let balance = 0;
+            let tapsPerClick = 1;
+            let tapsPerSecond = 0;
+            let autoTapperInterval = null;
+            let adTimerInterval = null;
+            let adSeconds = 5;
+            
+            // Переменные для управления музыкой
+            let customMusicFile = null;
+            let customMusicUrl = null;
+            let isCustomMusicPlaying = false;
+            let isMusicRepeating = false;
+            
+            // Переменные для управления изображениями
+            let customImageFile = null;
+            let customImageUrl = null;
+            const defaultGifUrl = "https://gifs.obs.ru-moscow-1.hc.sbercloud.ru/fcae637ba9f2333c2348880c33f30ddb120dcf94d65bc6ec4310face52cb92db.gif";
+            let imageScale = 100;
+            
+            // Переменная для полноэкранного режима
+            let isFullscreen = false;
+            
+            // НОВЫЕ ПЕРЕМЕННЫЕ ДЛЯ ЦВЕТА ФОНА
+            let backgroundColor = "#ffff00";
+            let useGradient = true;
+            let gradientColors = ["#ffff00", "#ffeb3b", "#ffc107", "#ff9800"];
+            
+            // ПЕРЕМЕННЫЕ ДЛЯ АККАУНТА
+            let currentUser = null;
+            let users = {};
+            let loginStartTime = null;
+            
+            // Уменьшенный массив с улучшениями (убраны Тап-сингулярность и все после него)
+            const upgrades = [
+                {
+                    id: 1,
+                    name: "Усиленный палец",
+                    description: "Увеличивает тапы за клик на 1",
+                    baseCost: 50,
+                    cost: 50,
+                    level: 0,
+                    maxLevel: 20,
+                    effect: "tapsPerClick"
+                },
+                {
+                    id: 2,
+                    name: "Авто-тапер",
+                    description: "Автоматически тапает 1 раз в секунду",
+                    baseCost: 250,
+                    cost: 250,
+                    level: 0,
+                    maxLevel: 10,
+                    effect: "autoTapper"
+                },
+                {
+                    id: 3,
+                    name: "Мега-палец",
+                    description: "Увеличивает тапы за клик в 2 раза",
+                    baseCost: 1000,
+                    cost: 1000,
+                    level: 0,
+                    maxLevel: 5,
+                    effect: "multiplier"
+                },
+                {
+                    id: 4,
+                    name: "Тап-бот",
+                    description: "Автоматически тапает 5 раз в секунду",
+                    baseCost: 2500,
+                    cost: 2500,
+                    level: 0,
+                    maxLevel: 5,
+                    effect: "autoTapper5"
+                },
+                {
+                    id: 5,
+                    name: "Золотой палец",
+                    description: "Увеличивает доход от каждого тапа",
+                    baseCost: 5000,
+                    cost: 5000,
+                    level: 0,
+                    maxLevel: 3,
+                    effect: "goldenFinger"
+                },
+                {
+                    id: 6,
+                    name: "Тап-шторм",
+                    description: "Шанс 1% на 10x тапы за клик",
+                    baseCost: 25000,
+                    cost: 25000,
+                    level: 0,
+                    maxLevel: 3,
+                    effect: "tapStorm"
+                },
+                {
+                    id: 7,
+                    name: "Посмотри рекламу и получи один!",
+                    description: "Посмотри рекламу и получи +1 тап",
+                    baseCost: 0,
+                    cost: 0,
+                    level: 0,
+                    maxLevel: 999,
+                    effect: "watchAd",
+                    isAd: true
+                },
+                {
+                    id: 8,
+                    name: "Квантовый палец",
+                    description: "Тапы за клик ×3. Шанс 5% на квантовый прыжок",
+                    baseCost: 12500,
+                    cost: 12500,
+                    level: 0,
+                    maxLevel: 4,
+                    effect: "quantumFinger"
+                },
+                {
+                    id: 9,
+                    name: "Хаотичный тапер",
+                    description: "Случайные бонусные тапы каждые 3 секунды",
+                    baseCost: 17500,
+                    cost: 17500,
+                    level: 0,
+                    maxLevel: 6,
+                    effect: "chaoticTapper"
+                },
+                {
+                    id: 10,
+                    name: "Тап-ускоритель",
+                    description: "Увеличивает скорость авто-таперов на 20%",
+                    baseCost: 25000,
+                    cost: 25000,
+                    level: 0,
+                    maxLevel: 5,
+                    effect: "tapAccelerator"
+                },
+                {
+                    id: 11,
+                    name: "Небесный палец",
+                    description: "Каждый 50-й клик дает ×100 тапов",
+                    baseCost: 37500,
+                    cost: 37500,
+                    level: 0,
+                    maxLevel: 3,
+                    effect: "heavenlyFinger"
+                },
+                {
+                    id: 12,
+                    name: "Временная петля",
+                    description: "Шанс 15% на повторный клик",
+                    baseCost: 50000,
+                    cost: 50000,
+                    level: 0,
+                    maxLevel: 4,
+                    effect: "timeLoop"
+                },
+                {
+                    id: 13,
+                    name: "Тап-реактор",
+                    description: "Генерирует 10 тапов/сек постоянно",
+                    baseCost: 75000,
+                    cost: 75000,
+                    level: 0,
+                    maxLevel: 5,
+                    effect: "tapReactor"
+                },
+                {
+                    id: 14,
+                    name: "Звездный палец",
+                    description: "×5 тапов за клик, шанс 25% на ×3",
+                    baseCost: 125000,
+                    cost: 125000,
+                    level: 0,
+                    maxLevel: 4,
+                    effect: "stellarFinger"
+                },
+                {
+                    id: 15,
+                    name: "Бесконечный тапер",
+                    description: "Автоматически тапает 25 раз в секунду",
+                    baseCost: 250000,
+                    cost: 250000,
+                    level: 0,
+                    maxLevel: 3,
+                    effect: "infiniteTapper"
+                },
+                {
+                    id: 16,
+                    name: "Божественный палец",
+                    description: "×10 тапов за клик, шанс 50% на ×5",
+                    baseCost: 500000,
+                    cost: 500000,
+                    level: 0,
+                    maxLevel: 2,
+                    effect: "divineFinger"
+                }
+            ];
+            
+            const fakeAds = [
+                {
+                    title: "Установите TAP GAMES 3000!",
+                    product: "🎮",
+                    text: "Хотите тапать ещё быстрее? TAP GAMES 3000 - это революционное приложение для профессиональных таперов! Увеличивайте вашу продуктивность на 300%!",
+                    company: "TAP GAMES 3000",
+                    button: "УСТАНОВИТЬ БЕСПЛАТНО"
+                }
+            ];
+            
+            let audioContext = null;
+            let isMusicPlaying = false;
+            let musicVolume = 0.5; // Начальная громкость 50%
+            let isPromoUsed = false;
+            let isMopsPromoUsed = false;
+            let clickCounter = 0;
+            let chaoticTapperInterval = null;
+            let tapReactorInterval = null;
+            
+            // Элементы DOM
+            const tapCountElement = document.getElementById('tap-count');
+            const balanceElement = document.getElementById('balance');
+            const tapsPerClickElement = document.getElementById('taps-per-click');
+            const tapsPerSecondElement = document.getElementById('taps-per-second');
+            const gifElement = document.getElementById('animated-gif');
+            const upgradesContainer = document.getElementById('upgrades-container');
+            const playBtn = document.getElementById('play-btn');
+            const pauseBtn = document.getElementById('pause-btn');
+            const volumeSlider = document.getElementById('volume-slider');
+            const notificationElement = document.getElementById('notification');
+            const resetButton = document.getElementById('reset-button');
+            const resetOverlay = document.getElementById('reset-overlay');
+            const resetCancel = document.getElementById('reset-cancel');
+            const resetConfirm = document.getElementById('reset-confirm');
+            const resetTapCount = document.getElementById('reset-tap-count');
+            const resetBalance = document.getElementById('reset-balance');
+            const resetUpgradesCount = document.getElementById('reset-upgrades-count');
+            const resetGameLevel = document.getElementById('reset-game-level');
+            const adOverlay = document.getElementById('ad-overlay');
+            const adCloseBtn = document.getElementById('ad-close');
+            const adTitle = document.getElementById('ad-title');
+            const adTimer = document.getElementById('ad-timer');
+            const adButton = document.getElementById('ad-button');
+            const settingsButton = document.getElementById('settings-button');
+            const settingsOverlay = document.getElementById('settings-overlay');
+            const settingsCloseBtn = document.getElementById('settings-close');
+            const promoInput = document.getElementById('promo-input');
+            const promoButton = document.getElementById('promo-button');
+            const promoStatus = document.getElementById('promo-status');
+            const shopButton = document.getElementById('shop-button');
+            const shopOverlay = document.getElementById('shop-overlay');
+            const shopClose = document.getElementById('shop-close');
+            
+            // Элементы для управления музыкой
+            const musicFileInput = document.getElementById('music-file-input');
+            const musicUploadBtn = document.getElementById('music-upload-btn');
+            const musicRemoveBtn = document.getElementById('music-remove-btn');
+            const musicFileInfo = document.getElementById('music-file-info');
+            const musicFileName = document.getElementById('music-file-name');
+            const musicFileType = document.getElementById('music-file-type');
+            const musicFileSize = document.getElementById('music-file-size');
+            const musicStatus = document.getElementById('music-status');
+            const audioPlayer = document.getElementById('custom-audio-player');
+            const audioPlayBtn = document.getElementById('audio-play-btn');
+            const audioPauseBtn = document.getElementById('audio-pause-btn');
+            const audioStopBtn = document.getElementById('audio-stop-btn');
+            
+            // НОВЫЕ ЭЛЕМЕНТЫ ДЛЯ ГРОМКОСТИ
+            const musicVolumeSlider = document.getElementById('music-volume-slider');
+            const musicVolumeValue = document.getElementById('music-volume-value');
+            const volumeDownBtn = document.getElementById('volume-down-btn');
+            const volumeUpBtn = document.getElementById('volume-up-btn');
+            const volumeMuteBtn = document.getElementById('volume-mute-btn');
+            const volumeResetBtn = document.getElementById('volume-reset-btn');
+            
+            // НОВЫЕ ЭЛЕМЕНТЫ ДЛЯ ЦВЕТА ФОНА
+            const bgColorPicker = document.getElementById('bg-color-picker');
+            const bgColorValue = document.getElementById('bg-color-value');
+            const gradientToggle = document.getElementById('gradient-toggle');
+            const bgPreview = document.getElementById('bg-preview');
+            
+            // НОВЫЕ ЭЛЕМЕНТЫ ДЛЯ АККАУНТА
+            const accountButton = document.getElementById('account-button');
+            const accountOverlay = document.getElementById('account-overlay');
+            const accountAvatar = document.getElementById('account-avatar');
+            const accountAvatarImg = document.getElementById('account-avatar-img');
+            const avatarPreview = document.getElementById('avatar-preview');
+            const avatarPreviewImg = document.getElementById('avatar-preview-img');
+            const avatarInput = document.getElementById('avatar-input');
+            const avatarUploadBtn = document.getElementById('avatar-upload-btn');
+            const accountLoginForm = document.getElementById('account-login-form');
+            const accountProfile = document.getElementById('account-profile');
+            const loginUsername = document.getElementById('login-username');
+            const loginPassword = document.getElementById('login-password');
+            const loginError = document.getElementById('login-error');
+            const loginBtn = document.getElementById('login-btn');
+            const registerBtn = document.getElementById('register-btn');
+            const logoutBtn = document.getElementById('logout-btn');
+            const closeAccount = document.getElementById('close-account');
+            const welcomeMessage = document.getElementById('welcome-message');
+            const statDays = document.getElementById('stat-days');
+            const statTaps = document.getElementById('stat-taps');
+            const statUpgrades = document.getElementById('stat-upgrades');
+            const accountHeader = document.getElementById('account-header');
+            
+            // Элементы для управления изображениями
+            const imageFileInput = document.getElementById('image-file-input');
+            const imageUploadBtn = document.getElementById('image-upload-btn');
+            const imageRemoveBtn = document.getElementById('image-remove-btn');
+            const imageFileInfo = document.getElementById('image-file-info');
+            const imageFileName = document.getElementById('image-file-name');
+            const imageFileType = document.getElementById('image-file-type');
+            const imageFileSize = document.getElementById('image-file-size');
+            const imageStatus = document.getElementById('image-status');
+            
+            // Элементы для масштабирования изображений
+            const imageScaleSlider = document.getElementById('image-scale-slider');
+            const scaleValue = document.getElementById('scale-value');
+            const scaleDownBtn = document.getElementById('scale-down-btn');
+            const scaleUpBtn = document.getElementById('scale-up-btn');
+            const scaleResetBtn = document.getElementById('scale-reset-btn');
+            
+            // Элементы для полноэкранного режима
+            const fullscreenStatus = document.getElementById('fullscreen-status');
+            const fullscreenToggleBtn = document.getElementById('fullscreen-toggle-btn');
+            const exitFullscreenBtn = document.getElementById('exit-fullscreen-btn');
+            
+            // Элементы для контроля повтора
+            const repeatToggleBtn = document.getElementById('repeat-toggle-btn');
+            const repeatIndicator = document.getElementById('repeat-indicator');
+            
+            // Элементы для крестиков
+            const musicCloseBtn = document.getElementById('music-close-btn');
+            const settingsMobileClose = document.getElementById('settings-mobile-close');
+            
+            // Основные функции
+            function initGame() {
+                // Инициализация клика по гифке
+                gifElement.addEventListener('click', function(e) {
+                    let addedTaps = calculateTapsPerClick();
+                    clickCounter++;
+                    
+                    // Проверка улучшения "Небесный палец"
+                    const heavenlyFingerUpgrade = upgrades.find(u => u.effect === 'heavenlyFinger');
+                    if (heavenlyFingerUpgrade && heavenlyFingerUpgrade.level > 0 && clickCounter % 50 === 0) {
+                        const bonusTaps = addedTaps * 100;
+                        addedTaps += bonusTaps;
+                        showNotification(`НЕБЕСНЫЙ ПАЛЕЦ! +${bonusTaps} тапов! ✨`, '#9C27B0');
+                    }
+                    
+                    // Проверка улучшения "Временная петля"
+                    const timeLoopUpgrade = upgrades.find(u => u.effect === 'timeLoop');
+                    if (timeLoopUpgrade && timeLoopUpgrade.level > 0 && Math.random() < (0.15 * timeLoopUpgrade.level)) {
+                        addedTaps += calculateTapsPerClick();
+                        showNotification(`ВРЕМЕННАЯ ПЕТЛЯ! Двойной клик! 🔄`, '#00BCD4');
+                    }
+                    
+                    // Проверка улучшения "Квантовый палец"
+                    const quantumFingerUpgrade = upgrades.find(u => u.effect === 'quantumFinger');
+                    if (quantumFingerUpgrade && quantumFingerUpgrade.level > 0 && Math.random() < 0.05) {
+                        const quantumBonus = addedTaps * 50;
+                        addedTaps += quantumBonus;
+                        showNotification(`КВАНТОВЫЙ ПРЫЖОК! +${quantumBonus} тапов! ⚛️`, '#3F51B5');
+                    }
+                    
+                    // Проверка улучшения "Звездный палец"
+                    const stellarFingerUpgrade = upgrades.find(u => u.effect === 'stellarFinger');
+                    if (stellarFingerUpgrade && stellarFingerUpgrade.level > 0 && Math.random() < 0.25) {
+                        addedTaps *= 3;
+                        showNotification(`ЗВЕЗДНЫЙ БОНУС! ×3 тапов! 🌟`, '#FF9800');
+                    }
+                    
+                    // Проверка улучшения "Божественный палец"
+                    const divineFingerUpgrade = upgrades.find(u => u.effect === 'divineFinger');
+                    if (divineFingerUpgrade && divineFingerUpgrade.level > 0 && Math.random() < 0.5) {
+                        addedTaps *= 5;
+                        showNotification(`БОЖЕСТВЕННАЯ СИЛА! ×5 тапов! 👑`, '#FF5722');
+                    }
+                    
+                    tapCount += addedTaps;
+                    balance += addedTaps;
+                    
+                    updateDisplay();
+                    this.classList.remove('jump');
+                    void this.offsetWidth;
+                    this.classList.add('jump');
+                    playTapSound();
+                    createTapEffect(e.clientX, e.clientY);
+                    
+                    // ТАП-ШТОРМ
+                    if (hasTapStorm() && Math.random() < 0.01) {
+                        const bonusTaps = addedTaps * 10;
+                        tapCount += bonusTaps;
+                        balance += bonusTaps;
+                        showNotification(`ТАП-ШТОРМ! +${bonusTaps} тапов! (шанс 1%)`, '#ff5722');
+                    }
+                    
+                    saveGame();
+                });
+                
+                // Музыкальные контролы
+                playBtn.addEventListener('click', playBackgroundMusic);
+                pauseBtn.addEventListener('click', pauseBackgroundMusic);
+                volumeSlider.addEventListener('input', updateVolume);
+                
+                // Авто-сохранение каждые 10 секунд
+                setInterval(saveGame, 10000);
+                
+                // Инициализация магазина
+                initShopSystem();
+                
+                // Инициализация настроек
+                initSettingsSystem();
+                
+                // Инициализация сброса
+                initResetSystem();
+                
+                // Инициализация рекламы
+                initAdSystem();
+                
+                // Инициализация музыки
+                initMusicSystem();
+                
+                // Инициализация системы изображений
+                initImageSystem();
+                
+                // Инициализация полноэкранного режима
+                initFullscreenSystem();
+                
+                // Инициализация крестика в музыкальных контролах
+                initMusicCloseButton();
+                
+                // Инициализация системы громкости
+                initVolumeSystem();
+                
+                // НОВОЕ: Инициализация системы цвета фона
+                initBackgroundColorSystem();
+                
+                // НОВОЕ: Инициализация системы аккаунта
+                initAccountSystem();
+                
+                // Запуск авто-таперов
+                startAutoTappers();
+                startSpecialIntervals();
+                
+                // Загрузка сохраненной игры
+                loadGame();
+                
+                // Инициализация аудио
+                initAudio();
+                
+                // Проверка текущего состояния полноэкранного режима
+                updateFullscreenStatus();
+            }
+            
+            // НОВАЯ ФУНКЦИЯ: Инициализация системы аккаунта
+            function initAccountSystem() {
+                // Загружаем пользователей из localStorage
+                loadUsers();
+                
+                // Загружаем текущего пользователя
+                loadCurrentUser();
+                
+                // Обработчик кнопки аккаунта
+                accountButton.addEventListener('click', function() {
+                    updateAccountUI();
+                    accountOverlay.classList.add('active');
+                });
+                
+                // Закрытие окна аккаунта
+                closeAccount.addEventListener('click', function() {
+                    accountOverlay.classList.remove('active');
+                });
+                
+                accountOverlay.addEventListener('click', function(e) {
+                    if (e.target === accountOverlay) {
+                        accountOverlay.classList.remove('active');
+                    }
+                });
+                
+                // Загрузка аватара
+                avatarUploadBtn.addEventListener('click', function() {
+                    if (currentUser) {
+                        avatarInput.click();
+                    } else {
+                        showNotification('Сначала войдите в аккаунт!', '#f44336');
+                    }
+                });
+                
+                avatarInput.addEventListener('change', function(e) {
+                    const file = e.target.files[0];
+                    if (file && currentUser) {
+                        loadAvatar(file);
+                    }
+                });
+                
+                // Вход
+                loginBtn.addEventListener('click', function() {
+                    login();
+                });
+                
+                // Регистрация
+                registerBtn.addEventListener('click', function() {
+                    register();
+                });
+                
+                // Выход
+                logoutBtn.addEventListener('click', function() {
+                    logout();
+                });
+                
+                // Enter в полях
+                loginPassword.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') login();
+                });
+                
+                loginUsername.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') login();
+                });
+            }
+            
+            function loadUsers() {
+                const savedUsers = localStorage.getItem('tapGame303_users');
+                if (savedUsers) {
+                    try {
+                        users = JSON.parse(savedUsers);
+                    } catch (e) {
+                        users = {};
+                    }
+                } else {
+                    users = {};
+                }
+            }
+            
+            function saveUsers() {
+                localStorage.setItem('tapGame303_users', JSON.stringify(users));
+            }
+            
+            function loadCurrentUser() {
+                const savedUser = localStorage.getItem('tapGame303_currentUser');
+                if (savedUser) {
+                    try {
+                        const userData = JSON.parse(savedUser);
+                        currentUser = userData;
+                        loginStartTime = userData.loginTime || Date.now();
+                        updateAccountAvatar();
+                        showNotification(`Добро пожаловать, ${currentUser.username}! 👋`, '#2196F3');
+                    } catch (e) {}
+                }
+            }
+            
+            function saveCurrentUser() {
+                if (currentUser) {
+                    currentUser.loginTime = loginStartTime;
+                    localStorage.setItem('tapGame303_currentUser', JSON.stringify(currentUser));
+                }
+            }
+            
+            function login() {
+                const username = loginUsername.value.trim();
+                const password = loginPassword.value.trim();
+                
+                loginError.textContent = '';
+                loginUsername.classList.remove('error');
+                loginPassword.classList.remove('error');
+                
+                if (!username) {
+                    loginError.textContent = 'Введите никнейм';
+                    loginUsername.classList.add('error');
+                    return;
+                }
+                
+                if (!password) {
+                    loginError.textContent = 'Введите пароль';
+                    loginPassword.classList.add('error');
+                    return;
+                }
+                
+                if (users[username] && users[username].password === password) {
+                    currentUser = {
+                        username: username,
+                        password: password,
+                        avatar: users[username].avatar || null,
+                        registrationDate: users[username].registrationDate || Date.now()
+                    };
+                    loginStartTime = Date.now();
+                    saveCurrentUser();
+                    updateAccountAvatar();
+                    updateAccountUI();
+                    showNotification(`Вход выполнен, ${username}! 🎉`, '#4CAF50');
+                    loginUsername.value = '';
+                    loginPassword.value = '';
+                } else {
+                    loginError.textContent = 'Неверный никнейм или пароль';
+                    loginPassword.classList.add('error');
+                    loginUsername.classList.add('error');
+                }
+            }
+            
+            function register() {
+                const username = loginUsername.value.trim();
+                const password = loginPassword.value.trim();
+                
+                loginError.textContent = '';
+                loginUsername.classList.remove('error');
+                loginPassword.classList.remove('error');
+                
+                if (!username) {
+                    loginError.textContent = 'Введите никнейм';
+                    loginUsername.classList.add('error');
+                    return;
+                }
+                
+                if (!password) {
+                    loginError.textContent = 'Введите пароль';
+                    loginPassword.classList.add('error');
+                    return;
+                }
+                
+                if (password.length < 6) {
+                    loginError.textContent = 'Пароль должен быть минимум 6 символов';
+                    loginPassword.classList.add('error');
+                    return;
+                }
+                
+                if (users[username]) {
+                    loginError.textContent = 'Пользователь уже существует';
+                    loginUsername.classList.add('error');
+                    return;
+                }
+                
+                users[username] = {
+                    password: password,
+                    avatar: null,
+                    registrationDate: Date.now()
+                };
+                saveUsers();
+                
+                currentUser = {
+                    username: username,
+                    password: password,
+                    avatar: null,
+                    registrationDate: Date.now()
+                };
+                loginStartTime = Date.now();
+                saveCurrentUser();
+                updateAccountAvatar();
+                updateAccountUI();
+                showNotification(`Регистрация успешна, ${username}! 🎉`, '#4CAF50');
+                loginUsername.value = '';
+                loginPassword.value = '';
+            }
+            
+            function logout() {
+                currentUser = null;
+                loginStartTime = null;
+                localStorage.removeItem('tapGame303_currentUser');
+                updateAccountAvatar();
+                updateAccountUI();
+                showNotification('Вы вышли из аккаунта 👋', '#FF9800');
+            }
+            
+            function loadAvatar(file) {
+                if (!currentUser) {
+                    showNotification('Сначала войдите в аккаунт!', '#f44336');
+                    return;
+                }
+                
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const avatarData = e.target.result;
+                    
+                    // Обновляем в текущем пользователе
+                    currentUser.avatar = avatarData;
+                    
+                    // Обновляем в базе пользователей
+                    if (users[currentUser.username]) {
+                        users[currentUser.username].avatar = avatarData;
+                    }
+                    
+                    saveUsers();
+                    saveCurrentUser();
+                    updateAccountAvatar();
+                    showNotification('Аватар загружен! 📸', '#4CAF50');
+                };
+                reader.readAsDataURL(file);
+            }
+            
+            function updateAccountAvatar() {
+                if (currentUser && currentUser.avatar) {
+                    // Показываем изображение в кнопке
+                    accountAvatar.style.display = 'none';
+                    accountAvatarImg.style.display = 'block';
+                    accountAvatarImg.src = currentUser.avatar;
+                    
+                    // Показываем в превью
+                    const previewText = avatarPreview.querySelector('.preview-text');
+                    previewText.style.display = 'none';
+                    avatarPreviewImg.style.display = 'block';
+                    avatarPreviewImg.src = currentUser.avatar;
+                } else {
+                    // Показываем заглушку
+                    accountAvatar.style.display = 'flex';
+                    accountAvatarImg.style.display = 'none';
+                    
+                    const previewText = avatarPreview.querySelector('.preview-text');
+                    previewText.style.display = 'flex';
+                    avatarPreviewImg.style.display = 'none';
+                }
+            }
+            
+            function updateAccountUI() {
+                if (currentUser) {
+                    accountLoginForm.style.display = 'none';
+                    accountProfile.style.display = 'block';
+                    accountHeader.textContent = `👤 ${currentUser.username}`;
+                    welcomeMessage.textContent = `Привет, ${currentUser.username}!`;
+                    
+                    // Обновляем статистику
+                    const days = Math.floor((Date.now() - (currentUser.registrationDate || Date.now())) / (1000 * 60 * 60 * 24));
+                    statDays.textContent = days || 0;
+                    statTaps.textContent = formatNumber(clickCounter);
+                    
+                    const purchasedUpgrades = upgrades.reduce((total, upgrade) => total + upgrade.level, 0);
+                    statUpgrades.textContent = purchasedUpgrades;
+                } else {
+                    accountLoginForm.style.display = 'block';
+                    accountProfile.style.display = 'none';
+                    accountHeader.textContent = '🔵 АККАУНТ';
+                }
+                updateAccountAvatar();
+            }
+            
+            // НОВАЯ ФУНКЦИЯ: Инициализация системы цвета фона
+            function initBackgroundColorSystem() {
+                // Загружаем сохраненные настройки
+                loadBackgroundSettings();
+                
+                // Обработчик изменения цвета в палитре
+                bgColorPicker.addEventListener('input', function() {
+                    backgroundColor = this.value;
+                    bgColorValue.textContent = backgroundColor;
+                    updateBackgroundColor();
+                    saveBackgroundSettings();
+                });
+                
+                // Обработчик переключения градиента
+                gradientToggle.addEventListener('change', function() {
+                    useGradient = this.checked;
+                    updateBackgroundColor();
+                    saveBackgroundSettings();
+                    showNotification(useGradient ? "Анимированный градиент включен 🌈" : "Градиент выключен, выбран однотонный фон", "#FF9800");
+                });
+                
+                // Обработчики для предустановок цвета
+                document.querySelectorAll('.color-preset').forEach(preset => {
+                    preset.addEventListener('click', function() {
+                        // Убираем активный класс у всех пресетов
+                        document.querySelectorAll('.color-preset').forEach(p => p.classList.remove('active'));
+                        this.classList.add('active');
+                        
+                        const isGradient = this.dataset.gradient === 'true';
+                        
+                        if (isGradient) {
+                            // Градиент по умолчанию
+                            useGradient = true;
+                            gradientToggle.checked = true;
+                            backgroundColor = "#ffff00";
+                            bgColorPicker.value = "#ffff00";
+                            bgColorValue.textContent = "#ffff00";
+                            
+                            // Восстанавливаем стандартный градиент
+                            document.body.style.background = 'linear-gradient(-45deg, #ffff00, #ffeb3b, #ffc107, #ff9800, #ffeb3b, #fff176, #ffd54f, #ffff00)';
+                            document.body.style.backgroundSize = '400% 400%';
+                            document.body.style.animation = 'gradientAnimation 15s ease infinite';
+                            
+                            showNotification("Восстановлен стандартный градиент 🌈", "#4CAF50");
+                        } else {
+                            const color = this.dataset.color;
+                            backgroundColor = color;
+                            bgColorPicker.value = color;
+                            bgColorValue.textContent = color;
+                            
+                            // Отключаем градиент
+                            useGradient = false;
+                            gradientToggle.checked = false;
+                            
+                            // Устанавливаем однотонный цвет
+                            document.body.style.background = backgroundColor;
+                            document.body.style.backgroundSize = 'auto';
+                            document.body.style.animation = 'none';
+                            
+                            showNotification(`Цвет фона изменен на ${color} 🎨`, "#4CAF50");
+                        }
+                        
+                        saveBackgroundSettings();
+                        updateBackgroundColor();
+                    });
+                });
+            }
+            
+            // НОВАЯ ФУНКЦИЯ: Обновление цвета фона
+            function updateBackgroundColor() {
+                if (useGradient) {
+                    // Если включен градиент, используем анимированный градиент
+                    document.body.style.background = 'linear-gradient(-45deg, #ffff00, #ffeb3b, #ffc107, #ff9800, #ffeb3b, #fff176, #ffd54f, #ffff00)';
+                    document.body.style.backgroundSize = '400% 400%';
+                    document.body.style.animation = 'gradientAnimation 15s ease infinite';
+                    
+                    // Обновляем предпросмотр
+                    if (bgPreview) {
+                        bgPreview.innerHTML = 'Предпросмотр: анимированный градиент 🌈';
+                        bgPreview.style.background = 'linear-gradient(45deg, #ffff00, #ff9800)';
+                        bgPreview.style.color = '#333';
+                    }
+                } else {
+                    // Однотонный фон
+                    document.body.style.background = backgroundColor;
+                    document.body.style.backgroundSize = 'auto';
+                    document.body.style.animation = 'none';
+                    
+                    // Обновляем предпросмотр
+                    if (bgPreview) {
+                        bgPreview.innerHTML = `Предпросмотр: ${backgroundColor}`;
+                        bgPreview.style.background = backgroundColor;
+                        bgPreview.style.color = '#fff';
+                        // Корректируем цвет текста для лучшей читаемости
+                        if (backgroundColor === '#ffffff' || backgroundColor === '#ffff00' || backgroundColor === '#ffeb3b') {
+                            bgPreview.style.color = '#333';
+                        } else {
+                            bgPreview.style.color = '#fff';
+                        }
+                    }
+                }
+            }
+            
+            // НОВАЯ ФУНКЦИЯ: Сохранение настроек фона
+            function saveBackgroundSettings() {
+                const bgSettings = {
+                    backgroundColor: backgroundColor,
+                    useGradient: useGradient
+                };
+                localStorage.setItem('tapGame303_background', JSON.stringify(bgSettings));
+            }
+            
+            // НОВАЯ ФУНКЦИЯ: Загрузка настроек фона
+            function loadBackgroundSettings() {
+                const savedBg = localStorage.getItem('tapGame303_background');
+                if (savedBg) {
+                    try {
+                        const settings = JSON.parse(savedBg);
+                        backgroundColor = settings.backgroundColor || "#ffff00";
+                        useGradient = settings.useGradient !== undefined ? settings.useGradient : true;
+                        
+                        // Обновляем элементы управления
+                        bgColorPicker.value = backgroundColor;
+                        bgColorValue.textContent = backgroundColor;
+                        gradientToggle.checked = useGradient;
+                        
+                        // Применяем настройки
+                        updateBackgroundColor();
+                    } catch (e) {
+                        console.error("Ошибка загрузки настроек фона:", e);
+                    }
+                }
+            }
+            
+            // НОВАЯ ФУНКЦИЯ: Инициализация системы громкости
+            function initVolumeSystem() {
+                // Слайдер громкости в настройках
+                musicVolumeSlider.addEventListener('input', function() {
+                    musicVolume = parseInt(this.value) / 100;
+                    musicVolumeValue.textContent = `${this.value}%`;
+                    updateVolumeFromSlider();
+                    saveSettings();
+                });
+                
+                // Кнопка уменьшения громкости
+                volumeDownBtn.addEventListener('click', function() {
+                    let currentVolume = parseInt(musicVolumeSlider.value);
+                    if (currentVolume > 0) {
+                        currentVolume = Math.max(0, currentVolume - 10);
+                        musicVolumeSlider.value = currentVolume;
+                        musicVolume = currentVolume / 100;
+                        musicVolumeValue.textContent = `${currentVolume}%`;
+                        updateVolumeFromSlider();
+                        saveSettings();
+                        showNotification(`Громкость уменьшена до ${currentVolume}%`, "#4CAF50");
+                    }
+                });
+                
+                // Кнопка увеличения громкости
+                volumeUpBtn.addEventListener('click', function() {
+                    let currentVolume = parseInt(musicVolumeSlider.value);
+                    if (currentVolume < 100) {
+                        currentVolume = Math.min(100, currentVolume + 10);
+                        musicVolumeSlider.value = currentVolume;
+                        musicVolume = currentVolume / 100;
+                        musicVolumeValue.textContent = `${currentVolume}%`;
+                        updateVolumeFromSlider();
+                        saveSettings();
+                        showNotification(`Громкость увеличена до ${currentVolume}%`, "#4CAF50");
+                    }
+                });
+                
+                // Кнопка выключения звука
+                volumeMuteBtn.addEventListener('click', function() {
+                    if (musicVolume > 0) {
+                        localStorage.setItem('tapGame303_lastVolume', musicVolumeSlider.value);
+                        musicVolumeSlider.value = 0;
+                        musicVolume = 0;
+                        musicVolumeValue.textContent = "0%";
+                        updateVolumeFromSlider();
+                        saveSettings();
+                        showNotification("Звук выключен 🔇", "#f44336");
+                    } else {
+                        const lastVolume = localStorage.getItem('tapGame303_lastVolume') || 50;
+                        musicVolumeSlider.value = lastVolume;
+                        musicVolume = lastVolume / 100;
+                        musicVolumeValue.textContent = `${lastVolume}%`;
+                        updateVolumeFromSlider();
+                        saveSettings();
+                        showNotification(`Звук включен на ${lastVolume}% 🔊`, "#4CAF50");
+                    }
+                });
+                
+                // Кнопка сброса громкости
+                volumeResetBtn.addEventListener('click', function() {
+                    musicVolumeSlider.value = 50;
+                    musicVolume = 0.5;
+                    musicVolumeValue.textContent = "50%";
+                    updateVolumeFromSlider();
+                    saveSettings();
+                    showNotification("Громкость сброшена к значению по умолчанию", "#4CAF50");
+                });
+                
+                // Загружаем сохраненную громкость
+                loadVolumeFromSettings();
+            }
+            
+            // НОВАЯ ФУНКЦИЯ: Обновление громкости из слайдера в настройках
+            function updateVolumeFromSlider() {
+                // Обновляем основной слайдер громкости
+                volumeSlider.value = musicVolume * 100;
+                
+                // Обновляем громкость фоновой музыки
+                if (audioContext) {
+                    // Громкость применяется при следующем воспроизведении звуков
+                }
+                
+                // Обновляем громкость пользовательской музыки
+                if (audioPlayer) {
+                    audioPlayer.volume = musicVolume;
+                }
+                
+                showNotification(`Громкость установлена на ${Math.round(musicVolume * 100)}%`, "#4CAF50");
+            }
+            
+            // НОВАЯ ФУНКЦИЯ: Загрузка сохраненной громкости
+            function loadVolumeFromSettings() {
+                const savedSettings = localStorage.getItem('tapGame303_settings');
+                if (savedSettings) {
+                    try {
+                        const settings = JSON.parse(savedSettings);
+                        if (settings.musicVolume) {
+                            musicVolume = settings.musicVolume;
+                            musicVolumeSlider.value = musicVolume * 100;
+                            musicVolumeValue.textContent = `${Math.round(musicVolume * 100)}%`;
+                            volumeSlider.value = musicVolume * 100;
+                            
+                            // Обновляем громкость аудиоплеера
+                            if (audioPlayer) {
+                                audioPlayer.volume = musicVolume;
+                            }
+                        }
+                    } catch (e) {
+                        console.error("Ошибка загрузки настроек громкости:", e);
+                    }
+                }
+            }
+            
+            // ИНИЦИАЛИЗАЦИЯ СИСТЕМЫ ПОЛНОЭКРАННОГО РЕЖИМА
+            function initFullscreenSystem() {
+                fullscreenToggleBtn.addEventListener('click', toggleFullscreen);
+                exitFullscreenBtn.addEventListener('click', exitFullscreen);
+                
+                document.addEventListener('keydown', function(e) {
+                    if (e.key === 'F11') {
+                        e.preventDefault();
+                        toggleFullscreen();
+                    }
+                    
+                    if (e.key === 'Escape' && isFullscreen) {
+                        exitFullscreen();
+                    }
+                });
+                
+                document.addEventListener('fullscreenchange', updateFullscreenStatus);
+                document.addEventListener('webkitfullscreenchange', updateFullscreenStatus);
+                document.addEventListener('mozfullscreenchange', updateFullscreenStatus);
+                document.addEventListener('MSFullscreenChange', updateFullscreenStatus);
+            }
+            
+            function toggleFullscreen() {
+                if (!document.fullscreenElement && !document.webkitFullscreenElement && 
+                    !document.mozFullScreenElement && !document.msFullscreenElement) {
+                    enterFullscreen();
+                } else {
+                    exitFullscreen();
+                }
+            }
+            
+            function enterFullscreen() {
+                const element = document.documentElement;
+                
+                if (element.requestFullscreen) {
+                    element.requestFullscreen();
+                } else if (element.webkitRequestFullscreen) {
+                    element.webkitRequestFullscreen();
+                } else if (element.mozRequestFullScreen) {
+                    element.mozRequestFullScreen();
+                } else if (element.msRequestFullscreen) {
+                    element.msRequestFullscreen();
+                }
+                
+                isFullscreen = true;
+                showNotification("Полноэкранный режим включен! 📺", "#FF9800");
+            }
+            
+            function exitFullscreen() {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                } else if (document.webkitExitFullscreen) {
+                    document.webkitExitFullscreen();
+                } else if (document.mozCancelFullScreen) {
+                    document.mozCancelFullScreen();
+                } else if (document.msExitFullscreen) {
+                    document.msExitFullscreen();
+                }
+                
+                isFullscreen = false;
+                showNotification("Полноэкранный режим выключен", "#4CAF50");
+            }
+            
+            function updateFullscreenStatus() {
+                isFullscreen = !!(document.fullscreenElement || document.webkitFullscreenElement || 
+                                 document.mozFullScreenElement || document.msFullscreenElement);
+                
+                if (isFullscreen) {
+                    fullscreenStatus.textContent = "📺 Полноэкранный режим активен";
+                    fullscreenStatus.classList.add('active');
+                    fullscreenToggleBtn.style.display = 'none';
+                    exitFullscreenBtn.style.display = 'flex';
+                } else {
+                    fullscreenStatus.textContent = "🔲 Обычный режим";
+                    fullscreenStatus.classList.remove('active');
+                    fullscreenToggleBtn.style.display = 'flex';
+                    exitFullscreenBtn.style.display = 'none';
+                }
+            }
+            
+            // Инициализация системы изображений
+            function initImageSystem() {
+                imageUploadBtn.addEventListener('click', function() {
+                    imageFileInput.click();
+                });
+                
+                imageFileInput.addEventListener('change', function(e) {
+                    const file = e.target.files[0];
+                    if (file) {
+                        loadCustomImage(file);
+                    }
+                });
+                
+                imageRemoveBtn.addEventListener('click', function() {
+                    resetCustomImage();
+                });
+                
+                imageScaleSlider.addEventListener('input', function() {
+                    imageScale = parseInt(this.value);
+                    updateImageScale();
+                    saveImageSettings();
+                });
+                
+                scaleDownBtn.addEventListener('click', function() {
+                    if (imageScale > 50) {
+                        imageScale -= 10;
+                        imageScaleSlider.value = imageScale;
+                        updateImageScale();
+                        saveImageSettings();
+                    }
+                });
+                
+                scaleUpBtn.addEventListener('click', function() {
+                    if (imageScale < 200) {
+                        imageScale += 10;
+                        imageScaleSlider.value = imageScale;
+                        updateImageScale();
+                        saveImageSettings();
+                    }
+                });
+                
+                scaleResetBtn.addEventListener('click', function() {
+                    imageScale = 100;
+                    imageScaleSlider.value = imageScale;
+                    updateImageScale();
+                    saveImageSettings();
+                    showNotification("Масштаб сброшен до 100%", "#4CAF50");
+                });
+                
+                loadCustomImageFromStorage();
+                loadImageSettings();
+            }
+            
+            function loadCustomImage(file) {
+                const validExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp'];
+                const fileExtension = '.' + file.name.split('.').pop().toLowerCase();
+                
+                if (!validExtensions.includes(fileExtension)) {
+                    showNotification("Неподдерживаемый формат файла! Используйте JPG, PNG, GIF или WEBP", "#f44336");
+                    return;
+                }
+                
+                if (file.size > 10 * 1024 * 1024) {
+                    showNotification("Файл слишком большой! Максимальный размер 10 МБ", "#f44336");
+                    return;
+                }
+                
+                customImageFile = file;
+                
+                if (customImageUrl) {
+                    URL.revokeObjectURL(customImageUrl);
+                }
+                customImageUrl = URL.createObjectURL(file);
+                gifElement.src = customImageUrl;
+                
+                updateImageFileInfo(file);
+                saveCustomImageToStorage(file);
+                updateImageScale();
+                
+                showNotification("Изображение загружено! 🖼️", "#4CAF50");
+                updateImageStatus();
+            }
+            
+            function updateImageFileInfo(file) {
+                imageFileName.textContent = file.name;
+                
+                let fileType = "Неизвестный формат";
+                if (file.name.toLowerCase().endsWith('.jpg') || file.name.toLowerCase().endsWith('.jpeg')) fileType = "JPG Изображение";
+                else if (file.name.toLowerCase().endsWith('.png')) fileType = "PNG Изображение";
+                else if (file.name.toLowerCase().endsWith('.gif')) fileType = "GIF Анимация";
+                else if (file.name.toLowerCase().endsWith('.webp')) fileType = "WEBP Изображение";
+                
+                imageFileType.textContent = fileType;
+                
+                let fileSizeText = "";
+                if (file.size < 1024) {
+                    fileSizeText = file.size + " Б";
+                } else if (file.size < 1024 * 1024) {
+                    fileSizeText = (file.size / 1024).toFixed(1) + " КБ";
+                } else {
+                    fileSizeText = (file.size / (1024 * 1024)).toFixed(1) + " МБ";
+                }
+                imageFileSize.textContent = fileSizeText;
+                
+                imageFileInfo.style.display = 'block';
+            }
+            
+            function updateImageScale() {
+                if (gifElement) {
+                    gifElement.style.transform = `scale(${imageScale / 100})`;
+                    scaleValue.textContent = `${imageScale}%`;
+                    imageScaleSlider.value = imageScale;
+                }
+            }
+            
+            function resetCustomImage() {
+                if (customImageUrl) {
+                    URL.revokeObjectURL(customImageUrl);
+                    customImageUrl = null;
+                    customImageFile = null;
+                }
+                
+                imageFileInput.value = "";
+                imageFileInfo.style.display = 'none';
+                gifElement.src = defaultGifUrl;
+                gifElement.style.transform = 'scale(1)';
+                
+                localStorage.removeItem('tapGame303_customImage');
+                localStorage.removeItem('tapGame303_imageScale');
+                
+                updateImageStatus();
+                showNotification("Изображение сброшено к стандартной гифке 🗑️", "#4CAF50");
+            }
+            
+            function updateImageStatus() {
+                if (!customImageFile) {
+                    imageStatus.textContent = "🖼️ Используется стандартная гифка";
+                    imageStatus.className = "image-status no-file";
+                    imageStatus.style.cursor = "default";
+                    return;
+                }
+                
+                imageStatus.textContent = "✅ Используется ваше изображение";
+                imageStatus.className = "image-status playing";
+                imageStatus.style.cursor = "pointer";
+            }
+            
+            function saveCustomImageToStorage(file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const imageData = {
+                        name: file.name,
+                        type: file.type,
+                        size: file.size,
+                        data: e.target.result
+                    };
+                    localStorage.setItem('tapGame303_customImage', JSON.stringify(imageData));
+                };
+                reader.readAsDataURL(file);
+            }
+            
+            function saveImageSettings() {
+                const imageSettings = {
+                    scale: imageScale
+                };
+                localStorage.setItem('tapGame303_imageSettings', JSON.stringify(imageSettings));
+            }
+            
+            function loadImageSettings() {
+                const savedSettings = localStorage.getItem('tapGame303_imageSettings');
+                if (savedSettings) {
+                    try {
+                        const settings = JSON.parse(savedSettings);
+                        if (settings.scale) {
+                            imageScale = settings.scale;
+                            updateImageScale();
+                        }
+                    } catch (e) {}
+                }
+            }
+            
+            function loadCustomImageFromStorage() {
+                const savedImage = localStorage.getItem('tapGame303_customImage');
+                if (savedImage) {
+                    try {
+                        const imageData = JSON.parse(savedImage);
+                        
+                        const byteString = atob(imageData.data.split(',')[1]);
+                        const mimeString = imageData.type;
+                        const ab = new ArrayBuffer(byteString.length);
+                        const ia = new Uint8Array(ab);
+                        
+                        for (let i = 0; i < byteString.length; i++) {
+                            ia[i] = byteString.charCodeAt(i);
+                        }
+                        
+                        const blob = new Blob([ab], {type: mimeString});
+                        const file = new File([blob], imageData.name, {type: imageData.type});
+                        
+                        customImageFile = file;
+                        customImageUrl = URL.createObjectURL(file);
+                        gifElement.src = customImageUrl;
+                        
+                        updateImageFileInfo(file);
+                        updateImageStatus();
+                        updateImageScale();
+                        
+                    } catch (e) {
+                        console.error("Ошибка загрузки изображения из хранилища:", e);
+                    }
+                }
+            }
+            
+            // Инициализация магазина
+            function initShopSystem() {
+                shopButton.addEventListener('click', function() {
+                    shopOverlay.classList.add('active');
+                    renderUpgrades();
+                    showNotification("Магазин открыт! 🛒", "#4CAF50");
+                });
+                
+                shopClose.addEventListener('click', function() {
+                    shopOverlay.classList.remove('active');
+                });
+                
+                shopOverlay.addEventListener('click', function(e) {
+                    if (e.target === shopOverlay) {
+                        shopOverlay.classList.remove('active');
+                    }
+                });
+                
+                document.addEventListener('keydown', function(e) {
+                    if (e.key === 'Escape' && shopOverlay.classList.contains('active')) {
+                        shopOverlay.classList.remove('active');
+                    }
+                });
+            }
+            
+            // Инициализация настроек
+            function initSettingsSystem() {
+                settingsButton.addEventListener('click', function() {
+                    updatePromoStatus();
+                    updateMusicStatus();
+                    updateImageStatus();
+                    updateRepeatButton();
+                    updateFullscreenStatus();
+                    updateVolumeDisplay();
+                    settingsOverlay.classList.add('active');
+                });
+                
+                settingsCloseBtn.addEventListener('click', function() {
+                    closeSettings();
+                });
+                
+                settingsMobileClose.addEventListener('click', function() {
+                    closeSettingsWithMusic();
+                });
+                
+                settingsOverlay.addEventListener('click', function(e) {
+                    if (e.target === settingsOverlay) {
+                        closeSettings();
+                    }
+                });
+                
+                musicStatus.addEventListener('click', function() {
+                    closeSettingsWithMusic();
+                });
+                
+                promoButton.addEventListener('click', activatePromoCode);
+                promoInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') activatePromoCode();
+                });
+                
+                loadSettings();
+            }
+            
+            // ФУНКЦИЯ: Обновление отображения громкости
+            function updateVolumeDisplay() {
+                musicVolumeSlider.value = Math.round(musicVolume * 100);
+                musicVolumeValue.textContent = `${Math.round(musicVolume * 100)}%`;
+                volumeSlider.value = Math.round(musicVolume * 100);
+            }
+            
+            function closeSettings() {
+                settingsOverlay.classList.remove('active');
+                showNotification("Настройки закрыты", "#4CAF50");
+            }
+            
+            function closeSettingsWithMusic() {
+                settingsOverlay.classList.remove('active');
+                
+                let musicType = "";
+                
+                if (isCustomMusicPlaying) {
+                    musicType = "пользовательская музыка";
+                } else if (isMusicPlaying) {
+                    musicType = "фоновая музыка";
+                }
+                
+                if (musicType) {
+                    showNotification(`Настройки закрыты, ${musicType} продолжает играть 🎵`, "#4CAF50");
+                } else {
+                    showNotification("Настройки закрыты", "#4CAF50");
+                }
+            }
+            
+            // Инициализация крестика в музыкальных контролах
+            function initMusicCloseButton() {
+                musicCloseBtn.addEventListener('click', function() {
+                    const musicControls = document.querySelector('.music-controls');
+                    musicControls.style.display = 'none';
+                    
+                    if (isCustomMusicPlaying) {
+                        pauseCustomMusic();
+                    }
+                    
+                    if (isMusicPlaying) {
+                        pauseBackgroundMusic();
+                    }
+                    
+                    showNotification("Музыкальные контролы скрыты 🎵", "#4CAF50");
+                    
+                    localStorage.setItem('tapGame303_musicControlsHidden', 'true');
+                });
+                
+                const controlsHidden = localStorage.getItem('tapGame303_musicControlsHidden');
+                if (controlsHidden === 'true') {
+                    document.querySelector('.music-controls').style.display = 'none';
+                }
+            }
+            
+            // Функции для управления музыкой
+            function initMusicSystem() {
+                musicUploadBtn.addEventListener('click', function() {
+                    musicFileInput.click();
+                });
+                
+                musicFileInput.addEventListener('change', function(e) {
+                    const file = e.target.files[0];
+                    if (file) {
+                        loadCustomMusic(file);
+                    }
+                });
+                
+                musicRemoveBtn.addEventListener('click', function() {
+                    removeCustomMusic();
+                });
+                
+                audioPlayBtn.addEventListener('click', function() {
+                    playCustomMusic();
+                });
+                
+                audioPauseBtn.addEventListener('click', function() {
+                    pauseCustomMusic();
+                });
+                
+                audioStopBtn.addEventListener('click', function() {
+                    stopCustomMusic();
+                });
+                
+                repeatToggleBtn.addEventListener('click', toggleMusicRepeat);
+                
+                audioPlayer.addEventListener('ended', function() {
+                    if (isMusicRepeating && customMusicUrl) {
+                        audioPlayer.currentTime = 0;
+                        audioPlayer.play().then(() => {
+                            isCustomMusicPlaying = true;
+                            updateMusicStatus();
+                        }).catch(error => {
+                            console.error("Ошибка повторного воспроизведения:", error);
+                        });
+                    } else {
+                        isCustomMusicPlaying = false;
+                        updateMusicStatus();
+                    }
+                });
+                
+                loadCustomMusicFromStorage();
+                loadRepeatSetting();
+            }
+            
+            function toggleMusicRepeat() {
+                isMusicRepeating = !isMusicRepeating;
+                
+                if (isMusicRepeating) {
+                    repeatToggleBtn.classList.add('active');
+                    repeatToggleBtn.innerHTML = '<span>🔁</span> Повтор включен';
+                    repeatIndicator.classList.add('active');
+                    repeatIndicator.textContent = '∞';
+                    showNotification("Бесконечный повтор музыки включен 🔁", "#9C27B0");
+                    
+                    if (isCustomMusicPlaying) {
+                        audioPlayer.loop = true;
+                    }
+                } else {
+                    repeatToggleBtn.classList.remove('active');
+                    repeatToggleBtn.innerHTML = '<span>🔁</span> Повтор музыки';
+                    repeatIndicator.classList.remove('active');
+                    repeatIndicator.textContent = '?';
+                    showNotification("Повтор музыки выключен", "#757575");
+                    
+                    audioPlayer.loop = false;
+                }
+                
+                saveRepeatSetting();
+            }
+            
+            function updateRepeatButton() {
+                if (isMusicRepeating) {
+                    repeatToggleBtn.classList.add('active');
+                    repeatToggleBtn.innerHTML = '<span>🔁</span> Повтор включен';
+                    repeatIndicator.classList.add('active');
+                    repeatIndicator.textContent = '∞';
+                } else {
+                    repeatToggleBtn.classList.remove('active');
+                    repeatToggleBtn.innerHTML = '<span>🔁</span> Повтор музыки';
+                    repeatIndicator.classList.remove('active');
+                    repeatIndicator.textContent = '?';
+                }
+            }
+            
+            function saveRepeatSetting() {
+                localStorage.setItem('tapGame303_musicRepeat', isMusicRepeating.toString());
+            }
+            
+            function loadRepeatSetting() {
+                const savedRepeat = localStorage.getItem('tapGame303_musicRepeat');
+                if (savedRepeat !== null) {
+                    isMusicRepeating = savedRepeat === 'true';
+                    audioPlayer.loop = isMusicRepeating;
+                }
+            }
+            
+            function loadCustomMusic(file) {
+                const validExtensions = ['.mp3', '.ogg', '.wav', '.wave'];
+                const fileExtension = '.' + file.name.split('.').pop().toLowerCase();
+                
+                if (!validExtensions.includes(fileExtension)) {
+                    showNotification("Неподдерживаемый формат файла! Используйте MP3, OGG или WAV", "#f44336");
+                    return;
+                }
+                
+                if (file.size > 20 * 1024 * 1024) {
+                    showNotification("Файл слишком большой! Максимальный размер 20 МБ", "#f44336");
+                    return;
+                }
+                
+                customMusicFile = file;
+                
+                if (customMusicUrl) {
+                    URL.revokeObjectURL(customMusicUrl);
+                }
+                customMusicUrl = URL.createObjectURL(file);
+                audioPlayer.src = customMusicUrl;
+                audioPlayer.loop = isMusicRepeating;
+                audioPlayer.volume = musicVolume; // Устанавливаем текущую громкость
+                
+                updateMusicFileInfo(file);
+                saveCustomMusicToStorage(file);
+                
+                showNotification("Музыка загружена! 🎵", "#4CAF50");
+                updateMusicStatus();
+                updateRepeatButton();
+            }
+            
+            function updateMusicFileInfo(file) {
+                musicFileName.textContent = file.name;
+                
+                let fileType = "Неизвестный формат";
+                if (file.name.toLowerCase().endsWith('.mp3')) fileType = "MP3 Аудио";
+                else if (file.name.toLowerCase().endsWith('.ogg')) fileType = "OGG Аудио";
+                else if (file.name.toLowerCase().endsWith('.wav') || file.name.toLowerCase().endsWith('.wave')) fileType = "WAV Аудио";
+                
+                musicFileType.textContent = fileType;
+                
+                let fileSizeText = "";
+                if (file.size < 1024) {
+                    fileSizeText = file.size + " Б";
+                } else if (file.size < 1024 * 1024) {
+                    fileSizeText = (file.size / 1024).toFixed(1) + " КБ";
+                } else {
+                    fileSizeText = (file.size / (1024 * 1024)).toFixed(1) + " МБ";
+                }
+                musicFileSize.textContent = fileSizeText;
+                
+                musicFileInfo.style.display = 'block';
+            }
+            
+            function playCustomMusic() {
+                if (!customMusicUrl) {
+                    showNotification("Сначала загрузите музыку!", "#f44336");
+                    return;
+                }
+                
+                audioPlayer.loop = isMusicRepeating;
+                audioPlayer.volume = musicVolume; // Устанавливаем текущую громкость
+                
+                audioPlayer.play().then(() => {
+                    isCustomMusicPlaying = true;
+                    updateMusicStatus();
+                    showNotification(`Воспроизведение музыки ▶️${isMusicRepeating ? ' (повтор включен 🔁)' : ''}`, "#4CAF50");
+                }).catch(error => {
+                    showNotification("Ошибка воспроизведения музыки: " + error.message, "#f44336");
+                });
+            }
+            
+            function pauseCustomMusic() {
+                if (audioPlayer && !audioPlayer.paused) {
+                    audioPlayer.pause();
+                    isCustomMusicPlaying = false;
+                    updateMusicStatus();
+                    showNotification("Музыка на паузе ⏸️", "#FF9800");
+                }
+            }
+            
+            function stopCustomMusic() {
+                if (audioPlayer) {
+                    audioPlayer.pause();
+                    audioPlayer.currentTime = 0;
+                    isCustomMusicPlaying = false;
+                    updateMusicStatus();
+                    showNotification("Музыка остановлена ⏹️", "#f44336");
+                }
+            }
+            
+            function removeCustomMusic() {
+                if (customMusicUrl) {
+                    URL.revokeObjectURL(customMusicUrl);
+                    customMusicUrl = null;
+                    customMusicFile = null;
+                    audioPlayer.src = "";
+                }
+                
+                musicFileInput.value = "";
+                musicFileInfo.style.display = 'none';
+                isCustomMusicPlaying = false;
+                
+                localStorage.removeItem('tapGame303_customMusic');
+                
+                updateMusicStatus();
+                showNotification("Музыка удалена 🗑️", "#f44336");
+            }
+            
+            function updateMusicStatus() {
+                if (!customMusicFile) {
+                    musicStatus.textContent = "🎵 Музыка не загружена";
+                    musicStatus.className = "music-status no-file";
+                    musicStatus.style.cursor = "default";
+                    return;
+                }
+                
+                if (isCustomMusicPlaying) {
+                    musicStatus.textContent = `▶️ Музыка воспроизводится${isMusicRepeating ? ' 🔁' : ''}`;
+                    musicStatus.className = "music-status playing";
+                    musicStatus.style.cursor = "pointer";
+                } else {
+                    musicStatus.textContent = "⏸️ Музыка на паузе";
+                    musicStatus.className = "music-status stopped";
+                    musicStatus.style.cursor = "pointer";
+                }
+            }
+            
+            function saveCustomMusicToStorage(file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const musicData = {
+                        name: file.name,
+                        type: file.type,
+                        size: file.size,
+                        data: e.target.result
+                    };
+                    localStorage.setItem('tapGame303_customMusic', JSON.stringify(musicData));
+                };
+                reader.readAsDataURL(file);
+            }
+            
+            function loadCustomMusicFromStorage() {
+                const savedMusic = localStorage.getItem('tapGame303_customMusic');
+                if (savedMusic) {
+                    try {
+                        const musicData = JSON.parse(savedMusic);
+                        
+                        const byteString = atob(musicData.data.split(',')[1]);
+                        const mimeString = musicData.type;
+                        const ab = new ArrayBuffer(byteString.length);
+                        const ia = new Uint8Array(ab);
+                        
+                        for (let i = 0; i < byteString.length; i++) {
+                            ia[i] = byteString.charCodeAt(i);
+                        }
+                        
+                        const blob = new Blob([ab], {type: mimeString});
+                        const file = new File([blob], musicData.name, {type: musicData.type});
+                        
+                        customMusicFile = file;
+                        customMusicUrl = URL.createObjectURL(file);
+                        audioPlayer.src = customMusicUrl;
+                        audioPlayer.loop = isMusicRepeating;
+                        audioPlayer.volume = musicVolume; // Устанавливаем текущую громкость
+                        
+                        updateMusicFileInfo(file);
+                        updateMusicStatus();
+                        updateRepeatButton();
+                        
+                    } catch (e) {
+                        console.error("Ошибка загрузки музыки из хранилища:", e);
+                    }
+                }
+            }
+            
+            // Инициализация системы сброса
+            function initResetSystem() {
+                resetButton.addEventListener('click', function() {
+                    resetOverlay.classList.add('active');
+                    playWarningSound();
+                });
+                
+                resetCancel.addEventListener('click', function() {
+                    resetOverlay.classList.remove('active');
+                    showNotification("Сброс отменён", "#4CAF50");
+                });
+                
+                resetConfirm.addEventListener('click', function() {
+                    resetGame();
+                    resetOverlay.classList.remove('active');
+                });
+                
+                resetOverlay.addEventListener('click', function(e) {
+                    if (e.target === resetOverlay) {
+                        resetOverlay.classList.remove('active');
+                        showNotification("Сброс отменён", "#4CAF50");
+                    }
+                });
+            }
+            
+            // Инициализация системы рекламы
+            function initAdSystem() {
+                adCloseBtn.addEventListener('click', function() {
+                    if (adSeconds <= 0) closeAdWithReward();
+                });
+                
+                adButton.addEventListener('click', function() {
+                    if (adSeconds <= 0) closeAdWithReward();
+                });
+                
+                adOverlay.addEventListener('click', function(e) {
+                    if (e.target === adOverlay && adSeconds <= 0) {
+                        closeAdWithReward();
+                    }
+                });
+            }
+            
+            // Другие функции
+            function updatePromoStatus() {
+                if (isPromoUsed && isMopsPromoUsed) {
+                    promoStatus.textContent = "❌ Все промокоды уже использованы";
+                    promoStatus.className = "promo-status used";
+                    promoButton.disabled = true;
+                    promoInput.disabled = true;
+                } else if (isPromoUsed || isMopsPromoUsed) {
+                    promoStatus.textContent = "🎁 Есть доступные промокоды";
+                    promoStatus.className = "promo-status available";
+                    promoButton.disabled = false;
+                    promoInput.disabled = false;
+                } else {
+                    promoStatus.textContent = "🎁 Промокод доступен для активации";
+                    promoStatus.className = "promo-status available";
+                    promoButton.disabled = false;
+                    promoInput.disabled = false;
+                }
+            }
+            
+            function activatePromoCode() {
+                const promoCode = promoInput.value.trim();
+                
+                if (!promoCode) {
+                    showNotification("Введите промокод!", "#f44336");
+                    promoInput.focus();
+                    return;
+                }
+                
+                if (promoCode.toUpperCase() === "TAPATEL404") {
+                    if (isPromoUsed) {
+                        showNotification("Этот промокод уже использован!", "#f44336");
+                        return;
+                    }
+                    
+                    balance += 1000;
+                    tapCount += 1000;
+                    isPromoUsed = true;
+                    
+                    updateDisplay();
+                    updatePromoStatus();
+                    showNotification("🎉 Промокод TAPATEL404 активирован! +1000 тапов!", "#4CAF50");
+                    
+                    saveGame();
+                    saveSettings();
+                    playPromoSuccessSound();
+                    promoInput.value = "";
+                    return;
+                }
+                
+                if (promoCode === "МОПСЫ ЗАХВАТЯТ МИР!") {
+                    if (isMopsPromoUsed) {
+                        showNotification("Этот промокод уже использован!", "#f44336");
+                        return;
+                    }
+                    
+                    balance += 1000000;
+                    tapCount += 1000000;
+                    isMopsPromoUsed = true;
+                    
+                    updateDisplay();
+                    updatePromoStatus();
+                    showNotification("🎉🎉🎉 ПРОМОКОД 'МОПСЫ ЗАХВАТЯТ МИР!' АКТИВИРОВАН! +1,000,000 ТАПОВ!!! 🎉🎉🎉", "#FF9800");
+                    
+                    playMopsPromoSound();
+                    
+                    saveGame();
+                    saveSettings();
+                    promoInput.value = "";
+                    return;
+                }
+                
+                showNotification("Неверный промокод!", "#f44336");
+                promoInput.value = "";
+                promoInput.focus();
+                playPromoErrorSound();
+            }
+            
+            function playMopsPromoSound() {
+                try {
+                    if (!audioContext) return;
+                    
+                    const notes = [
+                        523.25, 659.25, 783.99, 1046.50, 1318.51, 1567.98,
+                        2093.00, 2637.02, 3135.96, 4186.01
+                    ];
+                    
+                    let time = audioContext.currentTime;
+                    
+                    for (let i = 0; i < notes.length; i++) {
+                        setTimeout(() => {
+                            const oscillator = audioContext.createOscillator();
+                            const gainNode = audioContext.createGain();
+                            
+                            oscillator.connect(gainNode);
+                            gainNode.connect(audioContext.destination);
+                            
+                            oscillator.type = 'sine';
+                            oscillator.frequency.setValueAtTime(notes[i], audioContext.currentTime);
+                            
+                            gainNode.gain.setValueAtTime(0.2 * musicVolume, audioContext.currentTime);
+                            gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.5);
+                            
+                            oscillator.start(audioContext.currentTime);
+                            oscillator.stop(audioContext.currentTime + 0.5);
+                        }, i * 100);
+                    }
+                } catch (e) {}
+            }
+            
+            function playPromoSuccessSound() {
+                try {
+                    if (!audioContext) return;
+                    for (let i = 0; i < 5; i++) {
+                        setTimeout(() => {
+                            const oscillator = audioContext.createOscillator();
+                            const gainNode = audioContext.createGain();
+                            oscillator.connect(gainNode);
+                            gainNode.connect(audioContext.destination);
+                            const freq = 800 + i * 100;
+                            oscillator.frequency.setValueAtTime(freq, audioContext.currentTime);
+                            oscillator.frequency.exponentialRampToValueAtTime(freq * 1.5, audioContext.currentTime + 0.2);
+                            oscillator.type = 'sine';
+                            gainNode.gain.setValueAtTime(0.1 * musicVolume, audioContext.currentTime);
+                            gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.3);
+                            oscillator.start(audioContext.currentTime);
+                            oscillator.stop(audioContext.currentTime + 0.3);
+                        }, i * 100);
+                    }
+                } catch (e) {}
+            }
+            
+            function playPromoErrorSound() {
+                try {
+                    if (!audioContext) return;
+                    const oscillator = audioContext.createOscillator();
+                    const gainNode = audioContext.createGain();
+                    oscillator.connect(gainNode);
+                    gainNode.connect(audioContext.destination);
+                    oscillator.frequency.setValueAtTime(200, audioContext.currentTime);
+                    oscillator.frequency.exponentialRampToValueAtTime(100, audioContext.currentTime + 0.3);
+                    oscillator.type = 'sawtooth';
+                    gainNode.gain.setValueAtTime(0.1 * musicVolume, audioContext.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.3);
+                    oscillator.start(audioContext.currentTime);
+                    oscillator.stop(audioContext.currentTime + 0.3);
+                } catch (e) {}
+            }
+            
+            function saveSettings() {
+                const settings = { 
+                    isPromoUsed, 
+                    isMopsPromoUsed,
+                    musicVolume 
+                };
+                localStorage.setItem('tapGame303_settings', JSON.stringify(settings));
+            }
+            
+            function loadSettings() {
+                const savedSettings = localStorage.getItem('tapGame303_settings');
+                if (savedSettings) {
+                    try {
+                        const settings = JSON.parse(savedSettings);
+                        isPromoUsed = settings.isPromoUsed || false;
+                        isMopsPromoUsed = settings.isMopsPromoUsed || false;
+                        if (settings.musicVolume) {
+                            musicVolume = settings.musicVolume;
+                            volumeSlider.value = musicVolume * 100;
+                            updateVolumeDisplay();
+                        }
+                        updatePromoStatus();
+                    } catch (e) {}
+                }
+            }
+            
+            function startSpecialIntervals() {
+                if (chaoticTapperInterval) clearInterval(chaoticTapperInterval);
+                chaoticTapperInterval = setInterval(() => {
+                    const chaoticUpgrade = upgrades.find(u => u.effect === 'chaoticTapper');
+                    if (chaoticUpgrade && chaoticUpgrade.level > 0) {
+                        const bonus = Math.floor(Math.random() * (chaoticUpgrade.level * 5)) + 1;
+                        tapCount += bonus;
+                        balance += bonus;
+                        updateDisplay();
+                    }
+                }, 3000);
+                
+                if (tapReactorInterval) clearInterval(tapReactorInterval);
+                tapReactorInterval = setInterval(() => {
+                    const reactorUpgrade = upgrades.find(u => u.effect === 'tapReactor');
+                    if (reactorUpgrade && reactorUpgrade.level > 0) {
+                        const bonus = reactorUpgrade.level * 10;
+                        tapCount += bonus;
+                        balance += bonus;
+                        updateDisplay();
+                    }
+                }, 1000);
+            }
+            
+            function resetGame() {
+                const oldTapCount = tapCount;
+                const oldBalance = balance;
+                
+                tapCount = 0;
+                balance = 0;
+                tapsPerClick = 1;
+                tapsPerSecond = 0;
+                clickCounter = 0;
+                
+                upgrades.forEach(upgrade => {
+                    upgrade.level = 0;
+                    upgrade.cost = upgrade.baseCost;
+                });
+                
+                if (autoTapperInterval) clearInterval(autoTapperInterval);
+                if (chaoticTapperInterval) clearInterval(chaoticTapperInterval);
+                if (tapReactorInterval) clearInterval(tapReactorInterval);
+                
+                updateDisplay();
+                renderUpgrades();
+                startAutoTappers();
+                startSpecialIntervals();
+                
+                localStorage.removeItem('tapGame303');
+                
+                showNotification(`Игра сброшена! Удалено ${formatNumber(oldTapCount)} тапов`, "#f44336");
+                playResetSound();
+            }
+            
+            function playWarningSound() {
+                try {
+                    if (!audioContext) return;
+                    for (let i = 0; i < 3; i++) {
+                        setTimeout(() => {
+                            const oscillator = audioContext.createOscillator();
+                            const gainNode = audioContext.createGain();
+                            oscillator.connect(gainNode);
+                            gainNode.connect(audioContext.destination);
+                            oscillator.frequency.setValueAtTime(300, audioContext.currentTime);
+                            oscillator.frequency.exponentialRampToValueAtTime(150, audioContext.currentTime + 0.3);
+                            oscillator.type = 'sawtooth';
+                            gainNode.gain.setValueAtTime(0.1 * musicVolume, audioContext.currentTime);
+                            gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.3);
+                            oscillator.start(audioContext.currentTime);
+                            oscillator.stop(audioContext.currentTime + 0.3);
+                        }, i * 100);
+                    }
+                } catch (e) {}
+            }
+            
+            function playResetSound() {
+                try {
+                    if (!audioContext) return;
+                    const oscillator = audioContext.createOscillator();
+                    const gainNode = audioContext.createGain();
+                    oscillator.connect(gainNode);
+                    gainNode.connect(audioContext.destination);
+                    oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
+                    oscillator.frequency.exponentialRampToValueAtTime(50, audioContext.currentTime + 1);
+                    oscillator.type = 'sawtooth';
+                    gainNode.gain.setValueAtTime(0.2 * musicVolume, audioContext.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 1);
+                    oscillator.start(audioContext.currentTime);
+                    oscillator.stop(audioContext.currentTime + 1);
+                } catch (e) {}
+            }
+            
+            function initAudio() {
+                try {
+                    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                    createBackgroundMusic();
+                    document.addEventListener('click', unlockAudio, { once: true });
+                } catch (e) {}
+            }
+            
+            function createBackgroundMusic() {
+                if (!audioContext) return;
+                
+                const playMelody = () => {
+                    const melody = [
+                        { freq: 523.25, duration: 0.3 },
+                        { freq: 587.33, duration: 0.3 },
+                        { freq: 659.25, duration: 0.3 },
+                        { freq: 698.46, duration: 0.3 },
+                        { freq: 783.99, duration: 0.3 },
+                        { freq: 880.00, duration: 0.3 },
+                        { freq: 987.77, duration: 0.3 },
+                        { freq: 1046.50, duration: 0.6 }
+                    ];
+                    
+                    let time = audioContext.currentTime;
+                    
+                    melody.forEach((note) => {
+                        const oscillator = audioContext.createOscillator();
+                        const gainNode = audioContext.createGain();
+                        
+                        oscillator.connect(gainNode);
+                        gainNode.connect(audioContext.destination);
+                        
+                        oscillator.type = 'square';
+                        oscillator.frequency.setValueAtTime(note.freq, time);
+                        
+                        gainNode.gain.setValueAtTime(0, time);
+                        gainNode.gain.linearRampToValueAtTime(musicVolume * 0.2, time + 0.05);
+                        gainNode.gain.linearRampToValueAtTime(0, time + note.duration);
+                        
+                        oscillator.start(time);
+                        oscillator.stop(time + note.duration);
+                        
+                        time += note.duration;
+                    });
+                    
+                    setTimeout(playMelody, 2400);
+                };
+                
+                const playBass = () => {
+                    const bassNotes = [130.81, 146.83, 164.81, 174.61];
+                    
+                    let time = audioContext.currentTime;
+                    
+                    bassNotes.forEach((freq) => {
+                        const oscillator = audioContext.createOscillator();
+                        const gainNode = audioContext.createGain();
+                        
+                        oscillator.connect(gainNode);
+                        gainNode.connect(audioContext.destination);
+                        
+                        oscillator.type = 'sawtooth';
+                        oscillator.frequency.setValueAtTime(freq, time);
+                        
+                        gainNode.gain.setValueAtTime(0, time);
+                        gainNode.gain.linearRampToValueAtTime(musicVolume * 0.1, time + 0.1);
+                        gainNode.gain.linearRampToValueAtTime(0, time + 0.5);
+                        
+                        oscillator.start(time);
+                        oscillator.stop(time + 0.5);
+                        
+                        time += 0.6;
+                    });
+                    
+                    setTimeout(playBass, 2400);
+                };
+                
+                backgroundMusic = { playMelody, playBass };
+            }
+            
+            function playBackgroundMusic() {
+                if (!audioContext || isMusicPlaying) return;
+                
+                if (audioContext.state === 'suspended') {
+                    audioContext.resume();
+                }
+                
+                backgroundMusic.playMelody();
+                setTimeout(backgroundMusic.playBass, 600);
+                
+                isMusicPlaying = true;
+                showNotification("Музыка включена! 🎵", "#4CAF50");
+            }
+            
+            function pauseBackgroundMusic() {
+                isMusicPlaying = false;
+                showNotification("Музыка на паузе ⏸️", "#FF9800");
+            }
+            
+            function updateVolume() {
+                musicVolume = volumeSlider.value / 100;
+                musicVolumeSlider.value = musicVolume * 100;
+                musicVolumeValue.textContent = `${Math.round(musicVolume * 100)}%`;
+                saveSettings();
+                
+                // Обновляем громкость пользовательской музыки
+                if (audioPlayer) {
+                    audioPlayer.volume = musicVolume;
+                }
+            }
+            
+            function unlockAudio() {
+                if (audioContext && audioContext.state !== 'running') {
+                    audioContext.resume();
+                }
+            }
+            
+            function playTapSound() {
+                try {
+                    if (!audioContext) return;
+                    
+                    const oscillator = audioContext.createOscillator();
+                    const gainNode = audioContext.createGain();
+                    
+                    oscillator.connect(gainNode);
+                    gainNode.connect(audioContext.destination);
+                    
+                    let baseFreq = 300 + (tapCount % 100);
+                    if (tapsPerClick > 5) baseFreq += 100;
+                    if (tapsPerClick > 10) baseFreq += 100;
+                    
+                    oscillator.frequency.setValueAtTime(baseFreq, audioContext.currentTime);
+                    oscillator.frequency.exponentialRampToValueAtTime(baseFreq * 0.7, audioContext.currentTime + 0.1);
+                    
+                    oscillator.type = 'sine';
+                    
+                    gainNode.gain.setValueAtTime(0.1 * musicVolume, audioContext.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.2);
+                    
+                    oscillator.start(audioContext.currentTime);
+                    oscillator.stop(audioContext.currentTime + 0.2);
+                } catch (e) {}
+            }
+            
+            function calculateTapsPerClick() {
+                let taps = tapsPerClick;
+                
+                const multiplierUpgrade = upgrades.find(u => u.effect === 'multiplier');
+                if (multiplierUpgrade && multiplierUpgrade.level > 0) {
+                    taps *= Math.pow(2, multiplierUpgrade.level);
+                }
+                
+                const goldenFingerUpgrade = upgrades.find(u => u.effect === 'goldenFinger');
+                if (goldenFingerUpgrade && goldenFingerUpgrade.level > 0) {
+                    taps *= (1 + goldenFingerUpgrade.level * 0.5);
+                }
+                
+                const quantumFingerUpgrade = upgrades.find(u => u.effect === 'quantumFinger');
+                if (quantumFingerUpgrade && quantumFingerUpgrade.level > 0) {
+                    taps *= 3;
+                }
+                
+                const stellarFingerUpgrade = upgrades.find(u => u.effect === 'stellarFinger');
+                if (stellarFingerUpgrade && stellarFingerUpgrade.level > 0) {
+                    taps *= 5;
+                }
+                
+                const divineFingerUpgrade = upgrades.find(u => u.effect === 'divineFinger');
+                if (divineFingerUpgrade && divineFingerUpgrade.level > 0) {
+                    taps *= 10;
+                }
+                
+                return Math.floor(taps);
+            }
+            
+            function hasTapStorm() {
+                const tapStormUpgrade = upgrades.find(u => u.effect === 'tapStorm');
+                return tapStormUpgrade && tapStormUpgrade.level > 0;
+            }
+            
+            function startAutoTappers() {
+                if (autoTapperInterval) clearInterval(autoTapperInterval);
+                
+                autoTapperInterval = setInterval(() => {
+                    let autoTaps = 0;
+                    
+                    const autoTapperUpgrade = upgrades.find(u => u.effect === 'autoTapper');
+                    if (autoTapperUpgrade && autoTapperUpgrade.level > 0) {
+                        autoTaps += autoTapperUpgrade.level;
+                    }
+                    
+                    const autoTapper5Upgrade = upgrades.find(u => u.effect === 'autoTapper5');
+                    if (autoTapper5Upgrade && autoTapper5Upgrade.level > 0) {
+                        autoTaps += autoTapper5Upgrade.level * 5;
+                    }
+                    
+                    const infiniteTapperUpgrade = upgrades.find(u => u.effect === 'infiniteTapper');
+                    if (infiniteTapperUpgrade && infiniteTapperUpgrade.level > 0) {
+                        autoTaps += infiniteTapperUpgrade.level * 25;
+                    }
+                    
+                    const tapAcceleratorUpgrade = upgrades.find(u => u.effect === 'tapAccelerator');
+                    if (tapAcceleratorUpgrade && tapAcceleratorUpgrade.level > 0) {
+                        autoTaps = Math.floor(autoTaps * (1 + tapAcceleratorUpgrade.level * 0.2));
+                    }
+                    
+                    if (autoTaps > 0) {
+                        tapCount += autoTaps;
+                        balance += autoTaps;
+                        updateDisplay();
+                        saveGame();
+                    }
+                    
+                    tapsPerSecond = autoTaps;
+                    tapsPerSecondElement.textContent = tapsPerSecond;
+                    
+                }, 1000);
+            }
+            
+            function updateDisplay() {
+                tapCountElement.textContent = formatNumber(tapCount);
+                balanceElement.textContent = formatNumber(balance);
+                tapsPerClickElement.textContent = calculateTapsPerClick();
+                if (currentUser) {
+                    updateAccountUI();
+                }
+            }
+            
+            function formatNumber(num) {
+                if (num >= 1000000000) return (num / 1000000000).toFixed(2) + 'B';
+                if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
+                if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
+                return num.toString();
+            }
+            
+            function renderUpgrades() {
+                upgradesContainer.innerHTML = '';
+                
+                upgrades.forEach(upgrade => {
+                    const upgradeElement = document.createElement('div');
+                    const isAdUpgrade = upgrade.id === 7;
+                    const levelText = isAdUpgrade ? `Просмотров: ${upgrade.level}` : `Ур. ${upgrade.level}/${upgrade.maxLevel}`;
+                    
+                    upgradeElement.className = `upgrade-item ${upgrade.level > 0 ? 'purchased' : ''} ${isAdUpgrade ? 'ad-upgrade' : ''}`;
+                    upgradeElement.innerHTML = `
+                        ${isAdUpgrade ? '<div class="ad-badge">РЕКЛАМА</div>' : ''}
+                        <div class="upgrade-name">${upgrade.name}</div>
+                        <div class="upgrade-description">${upgrade.description}</div>
+                        <div class="upgrade-cost">
+                            <span>${formatNumber(upgrade.cost)} тапов</span>
+                            <span class="upgrade-level">${levelText}</span>
+                        </div>
+                    `;
+                    
+                    if (isAdUpgrade) {
+                        upgradeElement.addEventListener('click', () => showRandomAd());
+                    } else {
+                        upgradeElement.addEventListener('click', () => purchaseUpgrade(upgrade.id));
+                    }
+                    
+                    upgradesContainer.appendChild(upgradeElement);
+                });
+            }
+            
+            function purchaseUpgrade(upgradeId) {
+                const upgrade = upgrades.find(u => u.id === upgradeId);
+                
+                if (!upgrade || upgrade.level >= upgrade.maxLevel) {
+                    showNotification("Улучшение максимального уровня!", "#f44336");
+                    return;
+                }
+                
+                if (balance >= upgrade.cost) {
+                    balance -= upgrade.cost;
+                    upgrade.level++;
+                    upgrade.cost = Math.floor(upgrade.baseCost * Math.pow(1.5, upgrade.level));
+                    applyUpgradeEffect(upgrade);
+                    updateDisplay();
+                    renderUpgrades();
+                    showNotification(`Улучшение "${upgrade.name}" куплено!`, "#4CAF50");
+                    saveGame();
+                    
+                    if (upgrade.effect.includes('autoTapper') || upgrade.effect === 'tapAccelerator') {
+                        startAutoTappers();
+                    }
+                    if (upgrade.effect === 'tapsPerClick') tapsPerClick = 1 + upgrade.level;
+                    if (upgrade.effect === 'chaoticTapper' || upgrade.effect === 'tapReactor') {
+                        startSpecialIntervals();
+                    }
+                } else {
+                    showNotification("Недостаточно тапов!", "#f44336");
+                }
+            }
+            
+            function applyUpgradeEffect(upgrade) {
+                if (upgrade.effect === 'tapsPerClick') tapsPerClick = 1 + upgrade.level;
+            }
+            
+            function createTapEffect(x, y) {
+                const effect = document.createElement('div');
+                effect.className = 'tap-effect';
+                effect.style.left = (x - 15) + 'px';
+                effect.style.top = (y - 15) + 'px';
+                
+                document.body.appendChild(effect);
+                
+                setTimeout(() => {
+                    effect.remove();
+                }, 500);
+            }
+            
+            function showNotification(message, color) {
+                notificationElement.textContent = message;
+                notificationElement.style.backgroundColor = color;
+                notificationElement.classList.add('show');
+                
+                setTimeout(() => {
+                    notificationElement.classList.remove('show');
+                }, 3000);
+            }
+            
+            function saveGame() {
+                const gameData = { 
+                    tapCount, 
+                    balance, 
+                    tapsPerClick, 
+                    upgrades, 
+                    musicVolume,
+                    clickCounter,
+                    isPromoUsed,
+                    isMopsPromoUsed
+                };
+                localStorage.setItem('tapGame303', JSON.stringify(gameData));
+            }
+            
+            function loadGame() {
+                const savedData = localStorage.getItem('tapGame303');
+                
+                if (savedData) {
+                    try {
+                        const gameData = JSON.parse(savedData);
+                        
+                        tapCount = gameData.tapCount || 0;
+                        balance = gameData.balance || 0;
+                        tapsPerClick = gameData.tapsPerClick || 1;
+                        clickCounter = gameData.clickCounter || 0;
+                        isPromoUsed = gameData.isPromoUsed || false;
+                        isMopsPromoUsed = gameData.isMopsPromoUsed || false;
+                        
+                        if (gameData.upgrades) {
+                            upgrades.forEach((upgrade, index) => {
+                                if (gameData.upgrades[index]) {
+                                    upgrade.level = gameData.upgrades[index].level;
+                                    upgrade.cost = gameData.upgrades[index].cost;
+                                }
+                            });
+                        }
+                        
+                        if (gameData.musicVolume) {
+                            musicVolume = gameData.musicVolume;
+                            volumeSlider.value = musicVolume * 100;
+                            updateVolumeDisplay();
+                        }
+                        
+                        upgrades.forEach(upgrade => {
+                            if (upgrade.level > 0) applyUpgradeEffect(upgrade);
+                        });
+                        
+                        updateDisplay();
+                        renderUpgrades();
+                        startAutoTappers();
+                        startSpecialIntervals();
+                        updatePromoStatus();
+                        
+                        showNotification("Игра загружена! 👾", "#2196F3");
+                        
+                    } catch (e) {
+                        console.error("Ошибка загрузки игры:", e);
+                    }
+                }
+            }
+            
+            function showRandomAd() {
+                const randomAd = fakeAds[Math.floor(Math.random() * fakeAds.length)];
+                
+                adTitle.textContent = randomAd.title;
+                document.querySelector('.ad-product').textContent = randomAd.product;
+                document.querySelector('.ad-text').innerHTML = randomAd.text.replace(
+                    randomAd.company, 
+                    `<span class="ad-company">${randomAd.company}</span>`
+                );
+                adButton.textContent = randomAd.button;
+                
+                adSeconds = 5;
+                adTimer.textContent = `Реклама: ${adSeconds}с`;
+                adOverlay.classList.add('active');
+                
+                if (adTimerInterval) clearInterval(adTimerInterval);
+                
+                adTimerInterval = setInterval(() => {
+                    adSeconds--;
+                    adTimer.textContent = `Реклама: ${adSeconds}с`;
+                    
+                    if (adSeconds <= 0) {
+                        adTimer.textContent = "Можно закрыть";
+                        adCloseBtn.style.backgroundColor = "#4CAF50";
+                        clearInterval(adTimerInterval);
+                    }
+                }, 1000);
+                
+                playAdSound();
+            }
+            
+            function closeAdWithReward() {
+                adOverlay.classList.remove('active');
+                adCloseBtn.style.backgroundColor = "";
+                balance += 1;
+                tapCount += 1;
+                updateDisplay();
+                showNotification("+1 тап за просмотр рекламы! 📺", "#4CAF50");
+                playRewardSound();
+                saveGame();
+                
+                const adUpgrade = upgrades.find(u => u.id === 7);
+                if (adUpgrade) {
+                    adUpgrade.level++;
+                    renderUpgrades();
+                }
+            }
+            
+            function playAdSound() {
+                try {
+                    if (!audioContext) return;
+                    const oscillator = audioContext.createOscillator();
+                    const gainNode = audioContext.createGain();
+                    oscillator.connect(gainNode);
+                    gainNode.connect(audioContext.destination);
+                    oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
+                    oscillator.frequency.exponentialRampToValueAtTime(400, audioContext.currentTime + 0.3);
+                    oscillator.type = 'sine';
+                    gainNode.gain.setValueAtTime(0.1 * musicVolume, audioContext.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.3);
+                    oscillator.start(audioContext.currentTime);
+                    oscillator.stop(audioContext.currentTime + 0.3);
+                } catch (e) {}
+            }
+            
+            function playRewardSound() {
+                try {
+                    if (!audioContext) return;
+                    for (let i = 0; i < 3; i++) {
+                        setTimeout(() => {
+                            const oscillator = audioContext.createOscillator();
+                            const gainNode = audioContext.createGain();
+                            oscillator.connect(gainNode);
+                            gainNode.connect(audioContext.destination);
+                            const freq = 600 + i * 200;
+                            oscillator.frequency.setValueAtTime(freq, audioContext.currentTime);
+                            oscillator.type = 'sine';
+                            gainNode.gain.setValueAtTime(0.05 * musicVolume, audioContext.currentTime);
+                            gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.5);
+                            oscillator.start(audioContext.currentTime);
+                            oscillator.stop(audioContext.currentTime + 0.5);
+                        }, i * 100);
+                    }
+                } catch (e) {}
+            }
+            
+            // Запуск игры
+            initGame();
+        });
+    </script>
+</body>
+</html>
